@@ -27,6 +27,7 @@ class ToolEstimation
     void offset_init(Eigen::MatrixXd data, int desired_sample_num);
     void estimation_processing(Eigen::MatrixXd data); // 6*1 data fx fy fz tx ty tz
     void set_parameters(double control_time_init, double mass_of_tool_init);
+    void set_input_data(Eigen::MatrixXd linear_acc_input);
 
     std::vector<double> get_contact_force_data();
 

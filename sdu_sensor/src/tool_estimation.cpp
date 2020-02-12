@@ -60,15 +60,14 @@ void ToolEstimation::offset_init(Eigen::MatrixXd data,  int desired_sample_num)
 
 void ToolEstimation::estimation_processing(Eigen::MatrixXd data) // input entire force torque
 {
-  // tool_linear_acc_data = tool_linear_acc_data - offset_data;
-  //filtered_data = kalman_filter_linear_acc->kalman_filtering_processing(tool_linear_acc_data);
-
   //calculate contact force
   contacted_force_torque(0,0) = data(0,0) -(mass_of_tool * tool_linear_acc_data(0,0))*-1;
   contacted_force_torque(1,0) = data(1,0) -(mass_of_tool * tool_linear_acc_data(1,0))*-1;
   contacted_force_torque(2,0) = data(2,0) -(mass_of_tool * tool_linear_acc_data(2,0))*-1;
-  //
-  //  filtered_data = contacted_force_torque;
+}
+void ToolEstimation::set_input_data(Eigen::MatrixXd linear_acc_input)
+{
+  tool_linear_acc_data = linear_acc_input;
 }
 
 std::vector<double> ToolEstimation::get_contact_force_data()
