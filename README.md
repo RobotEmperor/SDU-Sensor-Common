@@ -25,7 +25,7 @@ SDU-Sensor-Common/tool_estimation includes the following functions available:
 
 * Tool's pose, force and torque estimation (Future works) 
 
-  Generally, we need to filter a sensor's value when we want to control a robot stably. These libraries offer for you to use basic sensor filters easily. In addition, the ur10e_force_torque_sensor library is suitable for ur10e F/T sensor to filter and process sensor signals. The library also includes various basic algorithms (for example, collision detection, tool's pose estimation) to do industrial tasks. The final point is that you can create filter/estimation algorithms and easily verify the algorithm by using these two libraries
+  Generally, we need to filter a sensor's value when we want to control a robot stably. These libraries offer for you to use basic sensor filters easily. In addition, the sdu_sensor library is suitable for any F/T sensor to filter and process sensor signals. The library also includes various basic algorithms (for example, collision detection, tool's pose estimation) to do industrial tasks. The final point is that you can create filter/estimation algorithms and easily verify the algorithm by using these libraries.
 
 ## Dependencies ##
 * [Eigen3] (http://eigen.tuxfamily.org/index.php?title=Main_Page)
