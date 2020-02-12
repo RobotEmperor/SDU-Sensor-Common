@@ -14,7 +14,6 @@
 
 #include <Eigen/Dense>
 
-
 #include "sdu_sensor/sensor_filter.h"
 #include "sdu_math/kinematics.h"
 #include "sdu_math/statistics_math.h"
@@ -35,7 +34,6 @@ class ToolEstimation
     std::shared_ptr<KalmanFilter> kf_estimated_contact_ft;
 
   private:
-
     double control_time;
     double mass_of_tool;
 
@@ -47,7 +45,4 @@ class ToolEstimation
     Eigen::MatrixXd contacted_force_torque;
     Eigen::MatrixXd estimated_data;
 };
-
-
-
 #endif /* TOOL_ESTIMATION_H_ */

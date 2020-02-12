@@ -6,10 +6,7 @@
  */
 
 #include "sensor_filter/sensor_filter.h"
-
-
 // low pass filter /////////////////////////////////////////////////////////
-
 LowPassFilter::LowPassFilter()
 {
   control_time = 0;
@@ -230,12 +227,10 @@ void KalmanBucyFilter::initialize(Eigen::MatrixXd state_variables, Eigen::Matrix
   //kalman gain
   kalman_gain_k.resize(state_variables.rows(),state_variables.rows());
   kalman_gain_k.fill(0);
-
 }
 
 Eigen::MatrixXd KalmanBucyFilter::kalman_bucy_filtering_processing(Eigen::MatrixXd measurement_z)
 {
-
   kalman_gain_k = estimated_value_p * H.transpose() * R.inverse();
 
   dt_value_x = F * estimated_value_x + kalman_gain_k * (measurement_z - (H * estimated_value_x));

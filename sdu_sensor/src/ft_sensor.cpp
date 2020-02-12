@@ -19,6 +19,7 @@
   {              \
   }
 #endif
+
 FTsensor::FTsensor()
 {
   low_pass_filter_ft  = std::make_shared<LowPassFilter>();
@@ -51,8 +52,6 @@ FTsensor::FTsensor()
   tx_detection = 0; tx_k = 0; tx_high_limit = 0; tx_low_limit = 0;
   ty_detection = 0; ty_k = 0; ty_high_limit = 0; ty_low_limit = 0;
   tz_detection = 0; tz_k = 0; tz_high_limit = 0; tz_low_limit = 0;
-
-  //initialize();
 }
 
 FTsensor::~FTsensor()
@@ -184,7 +183,6 @@ void FTsensor::filter_processing(Eigen::MatrixXd data)
   ft_filtered_data = kalman_filter_force_torque->get_kalman_filtered_data(data);
   collision_detection_processing(data);
 
-
   rate_of_change_ft_filtered_data = (ft_filtered_data - pre_ft_filtered_data)*(1/control_time);
 
   pre_ft_filtered_data = ft_filtered_data;
@@ -254,14 +252,11 @@ std::vector<double> FTsensor::get_offset_data()
     ft_offset_data_vector.push_back(ft_offset_data(num,0));
   }
   return ft_offset_data_vector;
-
-
 }
 std::vector<double> FTsensor::get_collision_detection_data()
 {
   std::vector<double> collision_detection_vector;
   collision_detection_vector.clear();
-
 
   collision_detection_vector.push_back(fx_detection);
   collision_detection_vector.push_back(fy_detection);
