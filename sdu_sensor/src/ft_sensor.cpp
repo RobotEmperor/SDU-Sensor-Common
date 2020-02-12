@@ -182,6 +182,7 @@ void FTsensor::filter_processing(Eigen::MatrixXd data)
 
   data = data - ft_offset_data;
   ft_filtered_data = kalman_filter_force_torque->get_kalman_filtered_data(data);
+  collision_detection_processing(data);
 
 
   rate_of_change_ft_filtered_data = (ft_filtered_data - pre_ft_filtered_data)*(1/control_time);

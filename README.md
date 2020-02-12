@@ -128,7 +128,7 @@ For example(for KalmanFilter),
     // ** if you have specific system model, you have to design F H Q R variables in matrix form. 
     
     //in the control loop 
-    KalmanFilter->get_kalman_filtered_data(data that you want to filter); // this function return to Eigen::MatrixXd
+    KalmanFilter->get_kalman_filtered_data(data that you want to filter); // this function returns to Eigen::MatrixXd
     // output filtered data in matrix form
     // in here, the output is force X, force Y, Force Z, Torque X, Torque Y, Torque Z in 6 X 1 matrix form
     
@@ -151,9 +151,9 @@ For example(for KalmanFilter),
   
     This function is to get offest value by sampling raw data of FT sensor for a certain period of time.
     
-  * signal_processing(Eigen::MatrixXd data) 
+  * filter_processing(Eigen::MatrixXd data) 
   
-    Filter algorithms are included.(Now only kalman filter)
+    Filter algorithms are included.(adaptive gain algorithm)
     
   * collision_detection(Eigen::MatrixXd data)
   
@@ -194,7 +194,7 @@ For example (How to use the library)
 For example (Load gain file YAML)
 
     std::shared_ptr<Ur10eFTsensor> ft_sensor;
-    ft_sensor = std::make_shared<Ur10eFTsensor>;
+    ft_sensor = std::make_shared<FTsensor>;
     
     std::string init_data_path; // it is to load config file.
     init_data_path = "../config/init_data.yaml"; // it must be in your project.
