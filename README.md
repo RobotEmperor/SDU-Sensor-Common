@@ -189,7 +189,7 @@ For example (How to use the library)
     //in the control loop
   
     ft_sensor->filter_processing(raw_force_torque_data); //
-    ft_sensor->get_offset_data(); you can get filtered data
+    ft_sensor->get_offset_data(); //you can get filtered data
     
 For example (Load gain file YAML)
 
