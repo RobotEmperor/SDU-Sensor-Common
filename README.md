@@ -45,7 +45,7 @@ SDU-Sensor-Common/tool_estimation includes the following functions available:
 
 ## Installation (Build Instruction) ##
 
-  sensor_filter
+  SDU-Sensor-Common
 
     git clone https://github.com/RobotEmperor/SDU-Sensor-Common.git
     cd SDU-Sensor-Common
