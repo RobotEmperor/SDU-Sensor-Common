@@ -25,8 +25,6 @@ FTsensor::FTsensor()
   low_pass_filter_ft  = std::make_shared<LowPassFilter>();
   high_pass_filter_ft = std::make_shared<HighPassFilter>();
 
-  ft_contact = std::make_shared<KalmanFilter>();
-  tool_estimation = std::make_shared<ToolEstimation>();
   kalman_filter_force_torque = std::make_shared<KalmanFilter>();
 
   control_time = 0;
@@ -130,6 +128,9 @@ void FTsensor::initialize(const std::string &path)
   ft_offset_data.resize(6,1);
   ft_offset_data.fill(0);
 
+  collision_detection.resize(6,1);
+  collision_detection.fill(0);
+
   low_pass_filter_ft->set_parameters(control_time, lpf_force_cutoff_frequency,ft_raw_data);
   high_pass_filter_ft->set_parameters(control_time, hpf_force_cutoff_frequency,ft_raw_data);
 
@@ -156,9 +157,6 @@ void FTsensor::initialize(const std::string &path)
   R_init = R_init * gain_r_low_frequency;
 
   kalman_filter_force_torque->initialize_system(F_init,H_init,Q_init,R_init,B_init,U_init,Z_init);
-
-  tool_estimation->set_parameters(control_time,mass_of_tool);
-  tool_estimation->initialize();
 }
 void FTsensor::offset_init(Eigen::MatrixXd data, int desired_sample_num)
 {
@@ -229,55 +227,24 @@ void FTsensor::collision_detection_processing(Eigen::MatrixXd data)
   ty_detection = calculate_cusum(data(4,0),ty_k,ty_high_limit,ty_low_limit);
   tz_detection = calculate_cusum(data(5,0),tz_k,tz_high_limit,tz_low_limit);
 }
-
-std::vector<double> FTsensor::get_filtered_data()
+Eigen::MatrixXd FTsensor::get_filtered_data()
 {
-  std::vector<double> ft_filtered_data_vector;
-  ft_filtered_data_vector.clear();
-
-  for(int num = 0; num < ft_filtered_data.rows(); num ++)
-  {
-    ft_filtered_data_vector.push_back(ft_filtered_data(num,0));
-  }
-
-  return ft_filtered_data_vector;
+  return ft_filtered_data;
 }
-std::vector<double> FTsensor::get_offset_data()
+Eigen::MatrixXd FTsensor::get_offset_data()
 {
-  std::vector<double> ft_offset_data_vector;
-  ft_offset_data_vector.clear();
-
-  for(int num = 0; num < ft_offset_data.rows(); num ++)
-  {
-    ft_offset_data_vector.push_back(ft_offset_data(num,0));
-  }
-  return ft_offset_data_vector;
+  return ft_offset_data;
 }
-std::vector<double> FTsensor::get_collision_detection_data()
+Eigen::MatrixXd FTsensor::get_collision_detection_data()
 {
-  std::vector<double> collision_detection_vector;
-  collision_detection_vector.clear();
+  collision_detection(0,0) = fx_detection;
+  collision_detection(1,0) = fy_detection;
+  collision_detection(2,0) = fz_detection;
+  collision_detection(3,0) = tx_detection;
+  collision_detection(4,0) = ty_detection;
+  collision_detection(5,0) = tz_detection;
 
-  collision_detection_vector.push_back(fx_detection);
-  collision_detection_vector.push_back(fy_detection);
-  collision_detection_vector.push_back(fz_detection);
-
-  collision_detection_vector.push_back(tx_detection);
-  collision_detection_vector.push_back(ty_detection);
-  collision_detection_vector.push_back(tz_detection);
-
-  return collision_detection_vector;
-}
-std::vector<double> FTsensor::get_contact_force_data()
-{
-  std::vector<double> contact_force_data_vector;
-  contact_force_data_vector.clear();
-
-  for(int num = 0; num < tool_estimation->get_contact_force_data().size(); num ++)
-  {
-    contact_force_data_vector.push_back(tool_estimation->get_contact_force_data()[num]);
-  }
-  return contact_force_data_vector;
+  return collision_detection;
 }
 
 

@@ -25,11 +25,10 @@ class ToolEstimation
     ~ToolEstimation();
     void initialize();
     void offset_init(Eigen::MatrixXd data, int desired_sample_num);
-    void estimation_processing(Eigen::MatrixXd data); // 6*1 data fx fy fz tx ty tz
     void set_parameters(double control_time_init, double mass_of_tool_init);
     void set_input_data(Eigen::MatrixXd linear_acc_input);
-
-    std::vector<double> get_contact_force_data();
+    Eigen::MatrixXd get_offset_data();
+    Eigen::MatrixXd get_contacted_force(Eigen::MatrixXd ft_data, Eigen::MatrixXd linear_acc_data); // 6*1 data fx fy fz tx ty tz
 
     //filter
     std::shared_ptr<KalmanFilter> kf_estimated_contact_ft;
@@ -45,5 +44,13 @@ class ToolEstimation
 
     Eigen::MatrixXd contacted_force_torque;
     Eigen::MatrixXd estimated_data;
+
+    Eigen::MatrixXd F_init;
+    Eigen::MatrixXd H_init;
+    Eigen::MatrixXd Q_init;
+    Eigen::MatrixXd R_init;
+    Eigen::MatrixXd B_init;
+    Eigen::MatrixXd U_init;
+    Eigen::MatrixXd Z_init;
 };
 #endif /* TOOL_ESTIMATION_H_ */

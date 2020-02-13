@@ -30,19 +30,16 @@ class FTsensor
     void parse_init_data(const std::string &path);
     void collision_detection_processing(Eigen::MatrixXd data); // 6*1 data fx fy fz tx ty tz
 
-    std::vector<double> get_filtered_data();
-    std::vector<double> get_offset_data();
-    std::vector<double> get_collision_detection_data();
-    std::vector<double> get_contact_force_data();
+    Eigen::MatrixXd get_filtered_data();
+    Eigen::MatrixXd get_offset_data();
+    Eigen::MatrixXd get_collision_detection_data();
+    Eigen::MatrixXd get_contact_force_data();
 
     //filter will be added
     std::shared_ptr<LowPassFilter>  low_pass_filter_ft;
     std::shared_ptr<HighPassFilter> high_pass_filter_ft;
 
     std::shared_ptr<KalmanFilter> kalman_filter_force_torque;
-    std::shared_ptr<KalmanFilter> ft_contact;
-
-    std::shared_ptr<ToolEstimation> tool_estimation;
 
   private:
 
@@ -76,6 +73,8 @@ class FTsensor
     Eigen::MatrixXd ft_offset_data;
     Eigen::MatrixXd ft_raw_data;
 
+    Eigen::MatrixXd collision_detection;
+
     Eigen::MatrixXd pre_ft_filtered_data;
     Eigen::MatrixXd rate_of_change_ft_filtered_data;
 
@@ -87,9 +86,6 @@ class FTsensor
     Eigen::MatrixXd U_init;
     Eigen::MatrixXd Z_init;
 };
-
-
-
 #endif /* FT_SENSOR_H_ */
 
 
