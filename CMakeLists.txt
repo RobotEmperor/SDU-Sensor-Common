@@ -17,14 +17,14 @@ set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CATKIN_DEVEL_PREFIX}/lib/pkgco
 find_package(PkgConfig)
 pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 
-INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/sensor_filter/include
-                     ${CMAKE_SOURCE_DIR}/sdu_sensor/include)
-
 set(LIB_HEADER_FILES
    ${CMAKE_SOURCE_DIR}/sensor_filter/include/sensor_filter/sensor_filter.h
    ${CMAKE_SOURCE_DIR}/sdu_sensor/include/ft_sensor/ft_sensor.h
    ${CMAKE_SOURCE_DIR}/sdu_sensor/include/tool_estimation/tool_estimation.h
 )
+
+INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/sensor_filter/include
+                     ${CMAKE_SOURCE_DIR}/sdu_sensor/include)
 
 INCLUDE_DIRECTORIES (${yaml_cpp_INCLUDE_DIRS})
 
