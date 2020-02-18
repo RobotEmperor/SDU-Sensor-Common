@@ -19,7 +19,7 @@ pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 
 set(LIB_HEADER_FILES
    ${CMAKE_SOURCE_DIR}/sensor_filter/include/sensor_filter/sensor_filter.h
-   ${CMAKE_SOURCE_DIR}/sdu_sensor/include/ft_sensor/ft_sensor.h
+   ${CMAKE_SOURCE_DIR}/sdu_sensor/include/ft_filter/ft_filter.h
    ${CMAKE_SOURCE_DIR}/sdu_sensor/include/tool_estimation/tool_estimation.h
 )
 
@@ -30,7 +30,7 @@ INCLUDE_DIRECTORIES (${yaml_cpp_INCLUDE_DIRS})
 
 set( sdu_sensor_SOURCE_FILES 
   sensor_filter/src/sensor_filter.cpp
-  sdu_sensor/src/ft_sensor.cpp
+  sdu_sensor/src/ft_filter.cpp
   sdu_sensor/src/tool_estimation.cpp
 )
 link_directories(/usr/local/lib)

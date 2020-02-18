@@ -34,23 +34,23 @@ class ToolEstimation
     std::shared_ptr<KalmanFilter> kf_estimated_contact_ft;
 
   private:
-    double control_time;
-    double mass_of_tool;
+    double control_time_;
+    double mass_of_tool_;
 
-    Eigen::MatrixXd inertia_of_tool;
+    Eigen::MatrixXd inertia_of_tool_;
 
-    Eigen::MatrixXd tool_linear_acc_data;
-    Eigen::MatrixXd tool_linear_acc_offset_data;
+    Eigen::MatrixXd tool_linear_acc_data_;
+    Eigen::MatrixXd tool_linear_acc_offset_data_;
 
-    Eigen::MatrixXd contacted_force_torque;
-    Eigen::MatrixXd estimated_data;
+    Eigen::MatrixXd contacted_force_torque_;
+    Eigen::MatrixXd estimated_data_;
 
-    Eigen::MatrixXd F_init;
-    Eigen::MatrixXd H_init;
-    Eigen::MatrixXd Q_init;
-    Eigen::MatrixXd R_init;
-    Eigen::MatrixXd B_init;
-    Eigen::MatrixXd U_init;
-    Eigen::MatrixXd Z_init;
+    Eigen::MatrixXd F_init_;
+    Eigen::MatrixXd H_init_;
+    Eigen::MatrixXd Q_init_;
+    Eigen::MatrixXd R_init_;
+    Eigen::MatrixXd B_init_;
+    Eigen::MatrixXd U_init_;
+    Eigen::MatrixXd Z_init_;
 };
 #endif /* TOOL_ESTIMATION_H_ */
