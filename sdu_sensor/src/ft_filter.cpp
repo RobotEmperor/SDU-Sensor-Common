@@ -12,7 +12,7 @@
 #if DEBUG_OUTPUT
 #define DEBUG(a)                                                \
   {                                                             \
-  std::cout << "FTsensor:" << __LINE__ << ": " << a << std::endl; \
+  std::cout << "FTfilter:" << __LINE__ << ": " << a << std::endl; \
   }
 #else
 #define DEBUG(a) \
@@ -20,7 +20,7 @@
   }
 #endif
 
-FTsensor::FTsensor()
+FTfilter::FTfilter()
 {
   low_pass_filter_ft  = std::make_shared<LowPassFilter>();
   high_pass_filter_ft = std::make_shared<HighPassFilter>();
@@ -52,10 +52,10 @@ FTsensor::FTsensor()
   tz_detection_ = 0; tz_k_ = 0; tz_high_limit_ = 0; tz_low_limit_ = 0;
 }
 
-FTsensor::~FTsensor()
+FTfilter::~FTfilter()
 {
 }
-void FTsensor::parse_init_data(const std::string &path)
+void FTfilter::parse_init_data(const std::string &path)
 {
   YAML::Node doc; // YAML file class declare
   try
@@ -109,7 +109,7 @@ void FTsensor::parse_init_data(const std::string &path)
   tz_low_limit_ = doc["tz_low_limit"].as<double>();
 }
 
-void FTsensor::initialize(const std::string &path)
+void FTfilter::initialize(const std::string &path)
 {
   parse_init_data(path);
 
@@ -158,7 +158,7 @@ void FTsensor::initialize(const std::string &path)
 
   kalman_filter_force_torque->initialize_system(F_init_,H_init_,Q_init_,R_init_,B_init_,U_init_,Z_init_);
 }
-void FTsensor::offset_init(Eigen::MatrixXd data, int desired_sample_num)
+void FTfilter::offset_init(Eigen::MatrixXd data, int desired_sample_num)
 {
   static int sample_num = 1;
 
@@ -173,7 +173,7 @@ void FTsensor::offset_init(Eigen::MatrixXd data, int desired_sample_num)
   sample_num ++;
 }
 
-void FTsensor::filter_processing(Eigen::MatrixXd data)
+void FTfilter::filter_processing(Eigen::MatrixXd data)
 {
   //kalman filer
 
@@ -218,7 +218,7 @@ void FTsensor::filter_processing(Eigen::MatrixXd data)
 }
 
 // collision detection
-void FTsensor::collision_detection_processing(Eigen::MatrixXd data)
+void FTfilter::collision_detection_processing(Eigen::MatrixXd data)
 {
   fx_detection_ = calculate_cusum(data(0,0),fx_k_,fx_high_limit_,fx_low_limit_); // how to decide k, limit
   fy_detection_ = calculate_cusum(data(1,0),fy_k_,fy_high_limit_,fy_low_limit_);
@@ -227,15 +227,15 @@ void FTsensor::collision_detection_processing(Eigen::MatrixXd data)
   ty_detection_ = calculate_cusum(data(4,0),ty_k_,ty_high_limit_,ty_low_limit_);
   tz_detection_ = calculate_cusum(data(5,0),tz_k_,tz_high_limit_,tz_low_limit_);
 }
-Eigen::MatrixXd FTsensor::get_filtered_data()
+Eigen::MatrixXd FTfilter::get_filtered_data()
 {
   return ft_filtered_data_;
 }
-Eigen::MatrixXd FTsensor::get_offset_data()
+Eigen::MatrixXd FTfilter::get_offset_data()
 {
   return ft_offset_data_;
 }
-Eigen::MatrixXd FTsensor::get_collision_detection_data()
+Eigen::MatrixXd FTfilter::get_collision_detection_data()
 {
   collision_detection_(0,0) = fx_detection_;
   collision_detection_(1,0) = fy_detection_;

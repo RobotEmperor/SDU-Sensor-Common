@@ -17,11 +17,11 @@
 #include "sdu_math/kinematics.h"
 #include "sdu_math/statistics_math.h"
 
-class FTsensor
+class FTfilter
 {
   public:
-    FTsensor();
-    ~FTsensor();
+    FTfilter();
+    ~FTfilter();
     void initialize(const std::string &path);
     void offset_init(Eigen::MatrixXd data, int desired_sample_num);
     void filter_processing(Eigen::MatrixXd data); // 6*1 data fx fy fz tx ty tz
