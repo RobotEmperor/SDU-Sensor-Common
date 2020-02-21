@@ -69,13 +69,13 @@ void ToolEstimation::initialize()
   // accelerometer initialize
   acc_R_init_ = ft_R_init_ * 20;
 
-  acc_F_init_.resize(3,3);
-  acc_H_init_.resize(3,3);
-  acc_Q_init_.resize(3,3);
-  acc_R_init_.resize(3,3);
-  acc_B_init_.resize(3,3);
-  acc_U_init_.resize(3,1);
-  acc_Z_init_.resize(3,1);
+  acc_F_init_.resize(4,4);
+  acc_H_init_.resize(4,4);
+  acc_Q_init_.resize(4,4);
+  acc_R_init_.resize(4,4);
+  acc_B_init_.resize(4,4);
+  acc_U_init_.resize(4,1);
+  acc_Z_init_.resize(4,1);
 
   acc_F_init_.setIdentity();
   acc_H_init_.setIdentity();
@@ -133,8 +133,11 @@ Eigen::MatrixXd ToolEstimation::get_angular_acc()
 
   filtered_acc_ = kf_accelerometer->get_kalman_filtered_data(tool_linear_acc_data_);
 
-  angle(0,0) = atan(-filtered_acc_(0,1)/(sqrt(pow(filtered_acc_(0,0),2) + pow(filtered_acc_(0,2),2) )));
-  angle(0,1) = atan(-filtered_acc_(0,0)/(sqrt(pow(filtered_acc_(0,1),2) + pow(filtered_acc_(0,2),2) ))); // rad
+  //angle(0,0) = atan(-filtered_acc_(1,0)/(sqrt(pow(filtered_acc_(0,0),2) + pow(filtered_acc_(2,0),2) )));
+  //angle(1,0) = atan(-filtered_acc_(0,0)/(sqrt(pow(filtered_acc_(1,0),2) + pow(filtered_acc_(2,0),2) ))); // rad
+
+  angle(0,0) = filtered_acc_(0,0);
+  angle(1,0) = filtered_acc_(1,0);
 
   return angle;
 }
@@ -142,37 +145,43 @@ Eigen::MatrixXd ToolEstimation::get_one_axis_inertia_tensor(Eigen::MatrixXd ft_d
 {
   if(axis.compare("x") == 0)
   {
-    if(angular_acceleration_(0,0) == 0 || angular_acceleration_(1,0) == 0 || angular_acceleration_(2,0) == 0 )
+    if(angular_acceleration_(0,0))
+    {
       inertia_of_tool_(0,0) = 0; inertia_of_tool_(1,0) = 0; inertia_of_tool_(2,0) = 0;
+    }
     else
     {
       inertia_of_tool_(0,0) = ft_data(3,0)/angular_acceleration_(0,0);
-      inertia_of_tool_(1,0) = ft_data(4,0)/angular_acceleration_(1,0);
-      inertia_of_tool_(2,0) = ft_data(5,0)/angular_acceleration_(2,0);
+      inertia_of_tool_(1,0) = ft_data(4,0)/angular_acceleration_(0,0);
+      inertia_of_tool_(2,0) = ft_data(5,0)/angular_acceleration_(0,0);
     }
     return inertia_of_tool_;
   }
   if(axis.compare("y") == 0)
   {
-    if(angular_acceleration_(0,1) == 0 || angular_acceleration_(1,1) == 0 || angular_acceleration_(2,2) == 0 )
+    if(angular_acceleration_(1,0) == 0 )
+    {
       inertia_of_tool_(0,1) = 0; inertia_of_tool_(1,1) = 0; inertia_of_tool_(2,1) = 0;
+    }
     else
     {
-      inertia_of_tool_(0,1) = ft_data(3,0)/angular_acceleration_(0,1);
-      inertia_of_tool_(1,1) = ft_data(4,0)/angular_acceleration_(1,1);
-      inertia_of_tool_(2,1) = ft_data(5,0)/angular_acceleration_(2,1);
+      inertia_of_tool_(0,1) = ft_data(3,0)/angular_acceleration_(1,0);
+      inertia_of_tool_(1,1) = ft_data(4,0)/angular_acceleration_(1,0);
+      inertia_of_tool_(2,1) = ft_data(5,0)/angular_acceleration_(1,0);
     }
     return inertia_of_tool_;
   }
   if(axis.compare("z") == 0)
   {
-    if(angular_acceleration_(0,2) == 0 || angular_acceleration_(1,2) == 0 || angular_acceleration_(2,2) == 0 )
+    if(angular_acceleration_(2,0) == 0)
+    {
       inertia_of_tool_(0,2) = 0; inertia_of_tool_(1,2) = 0; inertia_of_tool_(2,2) = 0;
+    }
     else
     {
-      inertia_of_tool_(0,2) = ft_data(3,0)/angular_acceleration_(0,2);
-      inertia_of_tool_(1,2) = ft_data(4,0)/angular_acceleration_(1,2);
-      inertia_of_tool_(2,2) = ft_data(5,0)/angular_acceleration_(2,2);
+      inertia_of_tool_(0,2) = ft_data(3,0)/angular_acceleration_(2,0);
+      inertia_of_tool_(1,2) = ft_data(4,0)/angular_acceleration_(2,0);
+      inertia_of_tool_(2,2) = ft_data(5,0)/angular_acceleration_(2,0);
     }
     return inertia_of_tool_;
   }

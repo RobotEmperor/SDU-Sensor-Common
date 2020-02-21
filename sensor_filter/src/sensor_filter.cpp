@@ -151,6 +151,9 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
 
   previous_correction_value_x_ = correction_value_x_;
   previous_correction_value_p_ = correction_value_p_;
+
+  kalman_gain_k_.resize(F_init.rows(),F_init.rows());
+  kalman_gain_k_.fill(0);
 }
 Eigen::MatrixXd KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measurement_z)
 {
@@ -162,16 +165,16 @@ Eigen::MatrixXd KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measureme
   {
     return correction_value_x_;
   }
-
+//
   kalman_gain_k_ = prediction_value_p_ * H_.transpose() * ((H_ * prediction_value_p_ * H_.transpose() + R_).inverse());
-
+//
   correction_value_x_ = prediction_value_x_ + kalman_gain_k_ * (measurement_z - (H_ * prediction_value_x_));
-
+//
   correction_value_p_ = prediction_value_p_ - (kalman_gain_k_ * H_ * prediction_value_p_);
-
+//
   previous_correction_value_x_ = correction_value_x_;
   previous_correction_value_p_ = correction_value_p_;
-
+//
   return correction_value_x_;
 }
 
