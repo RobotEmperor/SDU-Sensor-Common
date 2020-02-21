@@ -54,6 +54,7 @@ class ToolEstimation
     Eigen::MatrixXd estimated_data_;
 
     Eigen::MatrixXd filtered_acc_;
+    Eigen::MatrixXd angular_acceleration_;
 
 
     //ft sensor

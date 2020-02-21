@@ -43,6 +43,9 @@ void ToolEstimation::initialize()
   filtered_acc_.resize(3,1);
   filtered_acc_.fill(0);
 
+  angular_acceleration_.resize(3,1);
+  angular_acceleration_.fill(0);
+
   // ft contact initialize
   ft_F_init_.resize(6,6);
   ft_H_init_.resize(6,6);
@@ -137,9 +140,42 @@ Eigen::MatrixXd ToolEstimation::get_angular_acc()
 }
 Eigen::MatrixXd ToolEstimation::get_one_axis_inertia_tensor(Eigen::MatrixXd ft_data, std::string axis)
 {
-
-
-
+  if(axis.compare("x") == 0)
+  {
+    if(angular_acceleration_(0,0) == 0 || angular_acceleration_(1,0) == 0 || angular_acceleration_(2,0) == 0 )
+      inertia_of_tool_(0,0) = 0; inertia_of_tool_(1,0) = 0; inertia_of_tool_(2,0) = 0;
+    else
+    {
+      inertia_of_tool_(0,0) = ft_data(3,0)/angular_acceleration_(0,0);
+      inertia_of_tool_(1,0) = ft_data(4,0)/angular_acceleration_(1,0);
+      inertia_of_tool_(2,0) = ft_data(5,0)/angular_acceleration_(2,0);
+    }
+    return inertia_of_tool_;
+  }
+  if(axis.compare("y") == 0)
+  {
+    if(angular_acceleration_(0,1) == 0 || angular_acceleration_(1,1) == 0 || angular_acceleration_(2,2) == 0 )
+      inertia_of_tool_(0,1) = 0; inertia_of_tool_(1,1) = 0; inertia_of_tool_(2,1) = 0;
+    else
+    {
+      inertia_of_tool_(0,1) = ft_data(3,0)/angular_acceleration_(0,1);
+      inertia_of_tool_(1,1) = ft_data(4,0)/angular_acceleration_(1,1);
+      inertia_of_tool_(2,1) = ft_data(5,0)/angular_acceleration_(2,1);
+    }
+    return inertia_of_tool_;
+  }
+  if(axis.compare("z") == 0)
+  {
+    if(angular_acceleration_(0,2) == 0 || angular_acceleration_(1,2) == 0 || angular_acceleration_(2,2) == 0 )
+      inertia_of_tool_(0,2) = 0; inertia_of_tool_(1,2) = 0; inertia_of_tool_(2,2) = 0;
+    else
+    {
+      inertia_of_tool_(0,2) = ft_data(3,0)/angular_acceleration_(0,2);
+      inertia_of_tool_(1,2) = ft_data(4,0)/angular_acceleration_(1,2);
+      inertia_of_tool_(2,2) = ft_data(5,0)/angular_acceleration_(2,2);
+    }
+    return inertia_of_tool_;
+  }
 }
 Eigen::MatrixXd ToolEstimation::get_offset_data()
 {
