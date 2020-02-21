@@ -40,8 +40,7 @@ target_link_libraries(sdu_sensor sdu_math ${yaml_cpp_LIBRARIES} )
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 		# Give error in Linux if library is not fully linked (like Windows)
-		set_target_properties(sdu_sensor PROPERTIES LINK_FLAGS -Wl,--no-undefined)
- 
+		set_target_properties(sdu_sensor PROPERTIES LINK_FLAGS -Wl,--no-undefined) 
 	endif()
 
 	if(NOT DEFINED LIB_INSTALL_DIR)
@@ -68,7 +67,4 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 			${LIB_HEADER_FILES}
 			DESTINATION ${INCLUDE_INSTALL_DIR}/sdu_sensor
 			COMPONENT sdu_sensor
-	)
-
- 
- 
+			)

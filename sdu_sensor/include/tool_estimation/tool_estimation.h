@@ -26,12 +26,20 @@ class ToolEstimation
     void initialize();
     void offset_init(Eigen::MatrixXd data, int desired_sample_num);
     void set_parameters(double control_time_init, double mass_of_tool_init);
-    void set_input_data(Eigen::MatrixXd linear_acc_input);
+    void set_acc_input_data(Eigen::MatrixXd linear_acc_input);
     Eigen::MatrixXd get_offset_data();
+    Eigen::MatrixXd get_angular_acc();
+    Eigen::MatrixXd get_one_axis_inertia_tensor(Eigen::MatrixXd ft_data, std::string axis);
+
     Eigen::MatrixXd get_contacted_force(Eigen::MatrixXd ft_data, Eigen::MatrixXd linear_acc_data); // 6*1 data fx fy fz tx ty tz
 
     //filter
     std::shared_ptr<KalmanFilter> kf_estimated_contact_ft;
+
+    std::shared_ptr<KalmanFilter> kf_accelerometer;
+
+
+
 
   private:
     double control_time_;
@@ -45,12 +53,25 @@ class ToolEstimation
     Eigen::MatrixXd contacted_force_torque_;
     Eigen::MatrixXd estimated_data_;
 
-    Eigen::MatrixXd F_init_;
-    Eigen::MatrixXd H_init_;
-    Eigen::MatrixXd Q_init_;
-    Eigen::MatrixXd R_init_;
-    Eigen::MatrixXd B_init_;
-    Eigen::MatrixXd U_init_;
-    Eigen::MatrixXd Z_init_;
+    Eigen::MatrixXd filtered_acc_;
+
+
+    //ft sensor
+    Eigen::MatrixXd ft_F_init_;
+    Eigen::MatrixXd ft_H_init_;
+    Eigen::MatrixXd ft_Q_init_;
+    Eigen::MatrixXd ft_R_init_;
+    Eigen::MatrixXd ft_B_init_;
+    Eigen::MatrixXd ft_U_init_;
+    Eigen::MatrixXd ft_Z_init_;
+
+    //acc
+    Eigen::MatrixXd acc_F_init_;
+    Eigen::MatrixXd acc_H_init_;
+    Eigen::MatrixXd acc_Q_init_;
+    Eigen::MatrixXd acc_R_init_;
+    Eigen::MatrixXd acc_B_init_;
+    Eigen::MatrixXd acc_U_init_;
+    Eigen::MatrixXd acc_Z_init_;
 };
 #endif /* TOOL_ESTIMATION_H_ */
