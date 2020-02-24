@@ -1,5 +1,5 @@
 /*
- * ft_sensor.cpp
+ * ft_filter.cpp
  *
  *  Created on: Feb 12, 2020
  *      Author: yik
@@ -10,9 +10,9 @@
 #define DEBUG_OUTPUT false
 
 #if DEBUG_OUTPUT
-#define DEBUG(a)                                                \
-  {                                                             \
-  std::cout << "FTfilter:" << __LINE__ << ": " << a << std::endl; \
+#define DEBUG(a)                                                    \
+  {                                                                 \
+    std::cout << "FTfilter:" << __LINE__ << ": " << a << std::endl; \
   }
 #else
 #define DEBUG(a) \
@@ -22,7 +22,7 @@
 
 FTfilter::FTfilter()
 {
-  low_pass_filter_ft  = std::make_shared<LowPassFilter>();
+  low_pass_filter_ft = std::make_shared<LowPassFilter>();
   high_pass_filter_ft = std::make_shared<HighPassFilter>();
 
   kalman_filter_force_torque = std::make_shared<KalmanFilter>();
@@ -31,7 +31,7 @@ FTfilter::FTfilter()
   mass_of_tool_ = 0;
   lpf_force_cutoff_frequency_ = 0;
   lpf_torque_cutoff_frequency_ = 0;
-  hpf_force_cutoff_frequency_  = 0;
+  hpf_force_cutoff_frequency_ = 0;
   hpf_torque_cutoff_frequency_ = 0;
 
   gain_q_ = 0;
@@ -44,27 +44,45 @@ FTfilter::FTfilter()
   limit_low_rate_of_change_ = 0;
   limit_high_rate_of_change_ = 0;
 
-  fx_detection_ = 0; fx_k_ = 0; fx_high_limit_ = 0; fx_low_limit_ = 0;
-  fy_detection_ = 0; fy_k_ = 0; fy_high_limit_ = 0; fy_low_limit_ = 0;
-  fz_detection_ = 0; fz_k_ = 0; fz_high_limit_ = 0; fz_low_limit_ = 0;
-  tx_detection_ = 0; tx_k_ = 0; tx_high_limit_ = 0; tx_low_limit_ = 0;
-  ty_detection_ = 0; ty_k_ = 0; ty_high_limit_ = 0; ty_low_limit_ = 0;
-  tz_detection_ = 0; tz_k_ = 0; tz_high_limit_ = 0; tz_low_limit_ = 0;
+  fx_detection_ = 0;
+  fx_k_ = 0;
+  fx_high_limit_ = 0;
+  fx_low_limit_ = 0;
+  fy_detection_ = 0;
+  fy_k_ = 0;
+  fy_high_limit_ = 0;
+  fy_low_limit_ = 0;
+  fz_detection_ = 0;
+  fz_k_ = 0;
+  fz_high_limit_ = 0;
+  fz_low_limit_ = 0;
+  tx_detection_ = 0;
+  tx_k_ = 0;
+  tx_high_limit_ = 0;
+  tx_low_limit_ = 0;
+  ty_detection_ = 0;
+  ty_k_ = 0;
+  ty_high_limit_ = 0;
+  ty_low_limit_ = 0;
+  tz_detection_ = 0;
+  tz_k_ = 0;
+  tz_high_limit_ = 0;
+  tz_low_limit_ = 0;
 }
 
 FTfilter::~FTfilter()
 {
 }
+
 void FTfilter::parse_init_data(const std::string &path)
 {
-  YAML::Node doc; // YAML file class declare
+  YAML::Node doc;  // YAML file class declare
   try
   {
     // load yaml
-    doc = YAML::LoadFile(path.c_str()); // write the directory of file and load file
-
+    doc = YAML::LoadFile(path.c_str());  // write the directory of file and load file
   }
-  catch(const std::exception& e) // check error
+  catch (const std::exception &e)  // check error
   {
     printf("Fail to load yaml file!");
     return;
@@ -113,37 +131,37 @@ void FTfilter::initialize(const std::string &path)
 {
   parse_init_data(path);
 
-  ft_raw_data_.resize(6,1);
+  ft_raw_data_.resize(6, 1);
   ft_raw_data_.fill(0);
 
   ft_filtered_data_.resize(6, 1);
   ft_filtered_data_.fill(0);
 
-  pre_ft_filtered_data_.resize(6,1);
+  pre_ft_filtered_data_.resize(6, 1);
   pre_ft_filtered_data_.fill(0);
 
-  rate_of_change_ft_filtered_data_.resize(6,1);
+  rate_of_change_ft_filtered_data_.resize(6, 1);
   rate_of_change_ft_filtered_data_.fill(0);
 
-  ft_offset_data_.resize(6,1);
+  ft_offset_data_.resize(6, 1);
   ft_offset_data_.fill(0);
 
-  collision_detection_.resize(6,1);
+  collision_detection_.resize(6, 1);
   collision_detection_.fill(0);
 
-  low_pass_filter_ft->set_parameters(control_time_, lpf_force_cutoff_frequency_,ft_raw_data_);
-  high_pass_filter_ft->set_parameters(control_time_, hpf_force_cutoff_frequency_,ft_raw_data_);
+  low_pass_filter_ft->set_parameters(control_time_, lpf_force_cutoff_frequency_, ft_raw_data_);
+  high_pass_filter_ft->set_parameters(control_time_, hpf_force_cutoff_frequency_, ft_raw_data_);
 
   low_pass_filter_ft->initialize();
   high_pass_filter_ft->initialize();
 
-  F_init_.resize(6,6);
-  H_init_.resize(6,6);
-  Q_init_.resize(6,6);
-  R_init_.resize(6,6);
-  B_init_.resize(6,6);
-  U_init_.resize(6,1);
-  Z_init_.resize(6,1);
+  F_init_.resize(6, 6);
+  H_init_.resize(6, 6);
+  Q_init_.resize(6, 6);
+  R_init_.resize(6, 6);
+  B_init_.resize(6, 6);
+  U_init_.resize(6, 1);
+  Z_init_.resize(6, 1);
 
   F_init_.setIdentity();
   H_init_.setIdentity();
@@ -156,62 +174,63 @@ void FTfilter::initialize(const std::string &path)
   Q_init_ = Q_init_ * gain_q_;
   R_init_ = R_init_ * gain_r_low_frequency_;
 
-  kalman_filter_force_torque->initialize_system(F_init_,H_init_,Q_init_,R_init_,B_init_,U_init_,Z_init_);
+  kalman_filter_force_torque->initialize_system(F_init_, H_init_, Q_init_, R_init_, B_init_, U_init_, Z_init_);
 }
+
 void FTfilter::offset_init(Eigen::MatrixXd data, int desired_sample_num)
 {
   static int sample_num = 1;
 
   ft_offset_data_ += data;
 
-  if(sample_num == desired_sample_num)
+  if (sample_num == desired_sample_num)
   {
-    ft_offset_data_ = ft_offset_data_/(sample_num);
+    ft_offset_data_ = ft_offset_data_ / (sample_num);
     sample_num = 1;
     return;
   }
-  sample_num ++;
+  sample_num++;
 }
 
 void FTfilter::filter_processing(Eigen::MatrixXd data)
 {
-  //kalman filer
+  // kalman filer
 
   data = data - ft_offset_data_;
   ft_filtered_data_ = kalman_filter_force_torque->get_kalman_filtered_data(data);
   collision_detection_processing(data);
 
-  rate_of_change_ft_filtered_data_ = (ft_filtered_data_ - pre_ft_filtered_data_)*(1/control_time_);
+  rate_of_change_ft_filtered_data_ = (ft_filtered_data_ - pre_ft_filtered_data_) * (1 / control_time_);
 
   pre_ft_filtered_data_ = ft_filtered_data_;
 
   rate_of_change_ft_filtered_data_ = low_pass_filter_ft->get_lpf_filtered_data(rate_of_change_ft_filtered_data_);
 
-  for(int num = 0; num < 3; num ++)
+  for (int num = 0; num < 3; num++)
   {
-    if(rate_of_change_ft_filtered_data_(num,0) >  limit_high_rate_of_change_
-      || rate_of_change_ft_filtered_data_(num,0) < limit_low_rate_of_change_)
+    if (rate_of_change_ft_filtered_data_(num, 0) > limit_high_rate_of_change_ ||
+        rate_of_change_ft_filtered_data_(num, 0) < limit_low_rate_of_change_)
     {
-      R_init_(num,num) = gain_r_high_frequency_;
+      R_init_(num, num) = gain_r_high_frequency_;
       kalman_filter_force_torque->change_noise_value(R_init_);
     }
     else
     {
-      R_init_(num,num) = gain_r_low_frequency_;
+      R_init_(num, num) = gain_r_low_frequency_;
       kalman_filter_force_torque->change_noise_value(R_init_);
     }
   }
-  for(int num = 3; num < 6; num ++)
+  for (int num = 3; num < 6; num++)
   {
-    if(rate_of_change_ft_filtered_data_(num,0) >  limit_high_rate_of_change_*0.15
-      || rate_of_change_ft_filtered_data_(num,0) < limit_low_rate_of_change_*0.15)
+    if (rate_of_change_ft_filtered_data_(num, 0) > limit_high_rate_of_change_ * 0.15 ||
+        rate_of_change_ft_filtered_data_(num, 0) < limit_low_rate_of_change_ * 0.15)
     {
-      R_init_(num,num) = gain_r_torque_high_frequency_;
+      R_init_(num, num) = gain_r_torque_high_frequency_;
       kalman_filter_force_torque->change_noise_value(R_init_);
     }
     else
     {
-      R_init_(num,num) = gain_r_torque_low_frequency_;
+      R_init_(num, num) = gain_r_torque_low_frequency_;
       kalman_filter_force_torque->change_noise_value(R_init_);
     }
   }
@@ -220,35 +239,32 @@ void FTfilter::filter_processing(Eigen::MatrixXd data)
 // collision detection
 void FTfilter::collision_detection_processing(Eigen::MatrixXd data)
 {
-  fx_detection_ = calculate_cusum(data(0,0),fx_k_,fx_high_limit_,fx_low_limit_); // how to decide k, limit
-  fy_detection_ = calculate_cusum(data(1,0),fy_k_,fy_high_limit_,fy_low_limit_);
-  fz_detection_ = calculate_cusum(data(2,0),fz_k_,fz_high_limit_,fz_low_limit_);
-  tx_detection_ = calculate_cusum(data(3,0),tx_k_,tx_high_limit_,tx_low_limit_);
-  ty_detection_ = calculate_cusum(data(4,0),ty_k_,ty_high_limit_,ty_low_limit_);
-  tz_detection_ = calculate_cusum(data(5,0),tz_k_,tz_high_limit_,tz_low_limit_);
+  fx_detection_ = calculate_cusum(data(0, 0), fx_k_, fx_high_limit_, fx_low_limit_);  // how to decide k, limit
+  fy_detection_ = calculate_cusum(data(1, 0), fy_k_, fy_high_limit_, fy_low_limit_);
+  fz_detection_ = calculate_cusum(data(2, 0), fz_k_, fz_high_limit_, fz_low_limit_);
+  tx_detection_ = calculate_cusum(data(3, 0), tx_k_, tx_high_limit_, tx_low_limit_);
+  ty_detection_ = calculate_cusum(data(4, 0), ty_k_, ty_high_limit_, ty_low_limit_);
+  tz_detection_ = calculate_cusum(data(5, 0), tz_k_, tz_high_limit_, tz_low_limit_);
 }
+
 Eigen::MatrixXd FTfilter::get_filtered_data()
 {
   return ft_filtered_data_;
 }
+
 Eigen::MatrixXd FTfilter::get_offset_data()
 {
   return ft_offset_data_;
 }
+
 Eigen::MatrixXd FTfilter::get_collision_detection_data()
 {
-  collision_detection_(0,0) = fx_detection_;
-  collision_detection_(1,0) = fy_detection_;
-  collision_detection_(2,0) = fz_detection_;
-  collision_detection_(3,0) = tx_detection_;
-  collision_detection_(4,0) = ty_detection_;
-  collision_detection_(5,0) = tz_detection_;
+  collision_detection_(0, 0) = fx_detection_;
+  collision_detection_(1, 0) = fy_detection_;
+  collision_detection_(2, 0) = fz_detection_;
+  collision_detection_(3, 0) = tx_detection_;
+  collision_detection_(4, 0) = ty_detection_;
+  collision_detection_(5, 0) = tz_detection_;
 
   return collision_detection_;
 }
-
-
-
-
-
-

@@ -1,5 +1,5 @@
 # SDU-Sensor-Common
-  This is about sensor fitering and the signal process libraries for SDU sensor.
+This package provides sensor filtering and signal processing libraries for sensors used at SDU.
 
 ## Introduction ##
 SDU-Sensor-Common/sensor_filter includes the following filters available: 
@@ -15,11 +15,10 @@ SDU-Sensor-Common/sensor_filter includes the following filters available:
 SDU-Sensor-Common/ft_sensor includes the following functions available:
 
 * Signal Processing (Kalman filter)
-  * Adaptive gain algorithm (can change the kalman filter sensor noise gain R depending on the rate of changes of raw sensor data)
+* Adaptive gain algorithm (can change the kalman filter sensor noise gain R depending on the rate of changes of raw sensor data)
 * Offset Tunner
 * A filter gain file load using YAML 
 * Collision Detection
-
 
 SDU-Sensor-Common/tool_estimation includes the following functions available:
 
@@ -78,7 +77,7 @@ SDU-Sensor-Common/tool_estimation includes the following functions available:
 For example(for LowPassFilter), 
 
     std::shared_ptr<LowPassFilter> lpf;
-    lpf = std::make_shared<LowPassFilter>;
+    lpf = std::make_shared<LowPassFilter>();
     low_pass_filter_ft->set_parameters(0.002, 30, raw_data)//(control_time, lpf_force_cutoff_frequency, raw_data);
     //raw_data in form of Eigen::MatrixXd --> This instance is for using to fit internal matrix dimension.
     
@@ -94,7 +93,7 @@ For example(for LowPassFilter),
 For example(for KalmanFilter), 
 
     std::shared_ptr<KalmanFilter> kalman_filter;
-    kalman_filter = std::make_shared<KalmanFilter>;
+    kalman_filter = std::make_shared<KalmanFilter>();
     kalman_filter->initialize(state_variables, measurement_variables); 
     
     //this example is about only force torque sensor itself, so F,H,Q set identity matrix.
@@ -133,9 +132,9 @@ For example(for KalmanFilter),
     // in here, the output is force X, force Y, Force Z, Torque X, Torque Y, Torque Z in 6 X 1 matrix form
     
     
-  ### ft_sensor ###
+  ### ft_filter ###
 
-  FTsensor
+  FTfilter
   
   This library is for using F/T sensor easily. It uses the sensor_filter library to filter raw force/torque data. It also offers important data which can be used in control algorithm (for example, collision detection and tool estimation) 
   
@@ -159,44 +158,44 @@ For example(for KalmanFilter),
   
     This function can detect collision from raw force torque data by using CUSUM method (it was included in sdu_math library). It returns int value 1 and -1 when collision is detected. (Value 0 is default and non-contact)
     
-  * std::vector<double> FTsensor::get_filtered_data()
+  * std::vector<double> FTfilter::get_filtered_data()
     
     you can get filtered data from the kalman filter system which designed by user.
     
-  * std::vector<double> FTsensor::get_offset_data()
+  * std::vector<double> FTfilter::get_offset_data()
   
     it is for getting ft sensor offset data.
   
-  * std::vector<double> FTsensor::get_collision_detection_data()
+  * std::vector<double> FTfilter::get_collision_detection_data()
   
     it is for getting tool's collision detection signal (1 -> collision occurred/ 0 -> collision does not occur)
   
-  * std::vector<double> FTsensor::get_contact_force_data()
+  * std::vector<double> FTfilter::get_contact_force_data()
   
     it is for getting contact force data. 
     
 For example (How to use the library)
 
-    std::shared_ptr<FTsensor> ft_sensor;
-    ft_sensor = std::make_shared<FTsensor>;
+    std::shared_ptr<FTfilter> ft_filter;
+    ft_filter = std::make_shared<FTfilter>();
     
     std::string init_data_path; // it is to load config file.
     init_data_path = "../config/init_data.yaml"; // it must be in your project.
     
-    ft_sensor->initialize(init_data_path);
+    ft_filter->initialize(init_data_path);
     
     
     //in the control loop
   
-    ft_sensor->filter_processing(raw_force_torque_data); //
-    ft_sensor->get_offset_data(); //you can get filtered data
+    ft_filter->filter_processing(raw_force_torque_data); //
+    ft_filter->get_offset_data(); //you can get filtered data
     
 For example (Load gain file YAML)
 
-    std::shared_ptr<Ur10eFTsensor> ft_sensor;
-    ft_sensor = std::make_shared<FTsensor>;
+    std::shared_ptr<FTfilter> ft_filter;
+    ft_filter = std::make_shared<FTfilter>();
     
     std::string init_data_path; // it is to load config file.
     init_data_path = "../config/init_data.yaml"; // it must be in your project.
    
-    ft_sensor->initialize(init_data_path); 
+    ft_filter->initialize(init_data_path); 
