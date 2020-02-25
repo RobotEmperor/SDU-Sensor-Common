@@ -1,5 +1,5 @@
 /*
- * ft_sensor.h
+ * ft_filter.h
  *
  *  Created on: Feb 12, 2020
  *      Author: yik
@@ -13,7 +13,7 @@
 
 #include <Eigen/Dense>
 
-#include "sdu_sensor/sensor_filter.h"
+#include "sensor_filter/sensor_filter.h"
 #include "sdu_math/kinematics.h"
 #include "sdu_math/statistics_math.h"
 
