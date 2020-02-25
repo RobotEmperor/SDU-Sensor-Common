@@ -28,42 +28,30 @@ class ToolEstimation
     void set_parameters(double control_time_init, double mass_of_tool_init);
     void set_acc_input_data(Eigen::MatrixXd linear_acc_input);
     void set_pose_input_data(Eigen::MatrixXd pose);
-
-
     Eigen::MatrixXd get_offset_data();
     Eigen::MatrixXd get_angular_acc();
     Eigen::MatrixXd get_one_axis_inertia_tensor(Eigen::MatrixXd ft_data, std::string axis);
-    Eigen::MatrixXd get_contacted_force(Eigen::MatrixXd ft_data, Eigen::MatrixXd linear_acc_data); // 6*1 data fx fy fz tx ty tz
+    Eigen::MatrixXd get_contacted_force(Eigen::MatrixXd ft_data,
+                                        Eigen::MatrixXd linear_acc_data); // 6*1 data fx fy fz tx ty tz
 
     //filter
     std::shared_ptr<KalmanFilter> kf_estimated_contact_ft;
-
     std::shared_ptr<KalmanFilter> kf_accelerometer;
-
     std::shared_ptr<Kinematics> tool_kinematics;
-
     std::shared_ptr<Statistics> tool_statistics_orientation_vel;
-
     std::shared_ptr<Statistics> tool_statistics_orientation_acc;
 
-    Eigen::MatrixXd orientation_;
-
     Eigen::MatrixXd pose_;
-
+    Eigen::MatrixXd orientation_;
     Eigen::MatrixXd pose_vel_;
     Eigen::MatrixXd orientation_vel_;
-
     Eigen::MatrixXd pose_acc_;
     Eigen::MatrixXd orientation_acc_;
-
-
     Eigen::MatrixXd inertia_of_tool_;
-
 
   private:
     double control_time_;
     double mass_of_tool_;
-
 
     Eigen::MatrixXd tool_linear_acc_data_;
     Eigen::MatrixXd tool_linear_acc_offset_data_;
@@ -73,7 +61,6 @@ class ToolEstimation
 
     Eigen::MatrixXd filtered_acc_;
     Eigen::MatrixXd angular_acceleration_;
-
 
     //ft sensor
     Eigen::MatrixXd ft_F_init_;

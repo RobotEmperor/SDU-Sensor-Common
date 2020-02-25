@@ -18,7 +18,6 @@ ToolEstimation::~ToolEstimation()
 void ToolEstimation::initialize()
 {
   kf_estimated_contact_ft = std::make_shared<KalmanFilter>();
-
   kf_accelerometer        = std::make_shared<KalmanFilter>();
   tool_kinematics         = std::make_shared<Kinematics>();
   tool_statistics_orientation_vel = std::make_shared<Statistics>();
@@ -54,7 +53,6 @@ void ToolEstimation::initialize()
   inertia_of_tool_.fill(0);
   contacted_force_torque_.fill(0);
   estimated_data_.fill(0);
-
 
   pose_.fill(0);
   orientation_.fill(0);
@@ -137,7 +135,8 @@ void ToolEstimation::set_pose_input_data(Eigen::MatrixXd pose)
     pose_(num,0) = pose(num,0);
   }
 
-
+  orientation_ = tool_kinematics->get_axis_to_euler_angle(pose(3,0),pose(4,0),pose(5,0));
+}
 void ToolEstimation::offset_init(Eigen::MatrixXd data,  int desired_sample_num)
 {
   static int sample_num = 1;
@@ -161,13 +160,10 @@ Eigen::MatrixXd ToolEstimation::get_contacted_force(Eigen::MatrixXd ft_data,
   contacted_force_torque_(1, 0) = ft_data(1, 0) - (mass_of_tool_ * linear_acc_data(1, 0)) * -1;
   contacted_force_torque_(2, 0) = ft_data(2, 0) - (mass_of_tool_ * linear_acc_data(2, 0)) * -1;
 
-  contacted_force_torque_(3,0) = (inertia_of_tool_(0,0)*angular_acceleration_(0,0) + inertia_of_tool_(0,1)*angular_acceleration_(1,0) + inertia_of_tool_(0,2)*angular_acceleration_(2,0));
-  contacted_force_torque_(4,0) = (inertia_of_tool_(1,0)*angular_acceleration_(0,0) + inertia_of_tool_(1,1)*angular_acceleration_(1,0) + inertia_of_tool_(1,2)*angular_acceleration_(2,0));
-  contacted_force_torque_(5,0) = (inertia_of_tool_(2,0)*angular_acceleration_(0,0) + inertia_of_tool_(2,1)*angular_acceleration_(1,0) + inertia_of_tool_(2,2)*angular_acceleration_(2,0));
-
-
+  contacted_force_torque_(3,0) = (inertia_of_tool_(0,0) * angular_acceleration_(0,0) + inertia_of_tool_(0,1) * angular_acceleration_(1,0) + inertia_of_tool_(0,2) * angular_acceleration_(2,0));
+  contacted_force_torque_(4,0) = (inertia_of_tool_(1,0) * angular_acceleration_(0,0) + inertia_of_tool_(1,1) * angular_acceleration_(1,0) + inertia_of_tool_(1,2) * angular_acceleration_(2,0));
+  contacted_force_torque_(5,0) = (inertia_of_tool_(2,0) * angular_acceleration_(0,0) + inertia_of_tool_(2,1) * angular_acceleration_(1,0) + inertia_of_tool_(2,2) * angular_acceleration_(2,0));
   //contacted_force_torque_ = kf_estimated_contact_ft->get_kalman_filtered_data(contacted_force_torque_);
-
   return contacted_force_torque_;
 }
 

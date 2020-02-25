@@ -67,7 +67,6 @@ class KalmanFilter
   ~KalmanFilter();
   void initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_init, Eigen::MatrixXd Q_init, Eigen::MatrixXd R_init,
                          Eigen::MatrixXd B_init, Eigen::MatrixXd U_init, Eigen::MatrixXd Z_init);
-
   void change_noise_value(Eigen::MatrixXd R_init);
 
   // kalman filter process

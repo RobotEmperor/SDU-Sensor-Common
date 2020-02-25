@@ -239,14 +239,12 @@ void FTfilter::filter_processing(Eigen::MatrixXd data)
 // collision detection
 void FTfilter::collision_detection_processing(Eigen::MatrixXd data)
 {
-
-  fx_detection_ = calculate_cusum(data(0, 0), fx_k_, fx_high_limit_, fx_low_limit_);  // how to decide k, limit
-  fy_detection_ = calculate_cusum(data(1, 0), fy_k_, fy_high_limit_, fy_low_limit_);
-  fz_detection_ = calculate_cusum(data(2, 0), fz_k_, fz_high_limit_, fz_low_limit_);
-  tx_detection_ = calculate_cusum(data(3, 0), tx_k_, tx_high_limit_, tx_low_limit_);
-  ty_detection_ = calculate_cusum(data(4, 0), ty_k_, ty_high_limit_, ty_low_limit_);
-  tz_detection_ = calculate_cusum(data(5, 0), tz_k_, tz_high_limit_, tz_low_limit_);
-
+  //fx_detection_ = calculate_cusum(data(0, 0), fx_k_, fx_high_limit_, fx_low_limit_);  // how to decide k, limit
+  //fy_detection_ = calculate_cusum(data(1, 0), fy_k_, fy_high_limit_, fy_low_limit_);
+  //fz_detection_ = calculate_cusum(data(2, 0), fz_k_, fz_high_limit_, fz_low_limit_);
+  //tx_detection_ = calculate_cusum(data(3, 0), tx_k_, tx_high_limit_, tx_low_limit_);
+  //ty_detection_ = calculate_cusum(data(4, 0), ty_k_, ty_high_limit_, ty_low_limit_);
+  //tz_detection_ = calculate_cusum(data(5, 0), tz_k_, tz_high_limit_, tz_low_limit_);
 }
 
 Eigen::MatrixXd FTfilter::get_filtered_data()
