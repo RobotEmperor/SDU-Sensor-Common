@@ -163,7 +163,8 @@ Eigen::MatrixXd ToolEstimation::get_contacted_force(Eigen::MatrixXd ft_data,
   contacted_force_torque_(3,0) = (inertia_of_tool_(0,0) * angular_acceleration_(0,0) + inertia_of_tool_(0,1) * angular_acceleration_(1,0) + inertia_of_tool_(0,2) * angular_acceleration_(2,0));
   contacted_force_torque_(4,0) = (inertia_of_tool_(1,0) * angular_acceleration_(0,0) + inertia_of_tool_(1,1) * angular_acceleration_(1,0) + inertia_of_tool_(1,2) * angular_acceleration_(2,0));
   contacted_force_torque_(5,0) = (inertia_of_tool_(2,0) * angular_acceleration_(0,0) + inertia_of_tool_(2,1) * angular_acceleration_(1,0) + inertia_of_tool_(2,2) * angular_acceleration_(2,0));
-  //contacted_force_torque_ = kf_estimated_contact_ft->get_kalman_filtered_data(contacted_force_torque_);
+  contacted_force_torque_ = kf_estimated_contact_ft->get_kalman_filtered_data(contacted_force_torque_);
+
   return contacted_force_torque_;
 }
 
@@ -256,4 +257,13 @@ Eigen::MatrixXd ToolEstimation::get_offset_data()
   offset_data = tool_linear_acc_offset_data_;
 
   return offset_data;
+}
+Eigen::MatrixXd ToolEstimation::get_euler_angle()
+{
+  static Eigen::MatrixXd euler_angle;
+
+  euler_angle = orientation_;
+
+  return euler_angle;
+
 }

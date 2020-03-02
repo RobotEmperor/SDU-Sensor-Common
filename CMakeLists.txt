@@ -35,7 +35,7 @@ set( sdu_sensor_SOURCE_FILES
   sdu_sensor/src/tool_estimation.cpp
 )
 link_directories(/usr/local/lib)
-add_library(sdu_sensor STATIC ${sdu_sensor_SOURCE_FILES})
+add_library(sdu_sensor SHARED ${sdu_sensor_SOURCE_FILES})
 set_target_properties(sdu_sensor PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(sdu_sensor sdu_math ${yaml_cpp_LIBRARIES} )
 

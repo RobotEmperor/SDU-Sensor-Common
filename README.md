@@ -54,7 +54,7 @@ SDU-Sensor-Common/tool_estimation includes the following functions available:
     make 
     sudo make install 
     
-  These libraries are installed in /usr/local/lib and the headers are in /usr/local/include
+  These libraries are installed in /usr/local/lib and the headers are in /usr/local/include. The python bindings are also installed to your python site-package folder when running sudo make install.
   
 ## Cmake Example ## 
 
