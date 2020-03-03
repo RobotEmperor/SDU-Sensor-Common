@@ -90,7 +90,7 @@ void ToolEstimation::initialize()
   ft_R_init_ = ft_R_init_ * 5;
 
   kf_estimated_contact_ft->initialize_system(ft_F_init_, ft_H_init_, ft_Q_init_, ft_R_init_, ft_B_init_, ft_U_init_,
-                                             ft_Z_init_);
+      ft_Z_init_);
 
   // accelerometer initialize
   acc_R_init_ = ft_R_init_ * 20;
@@ -115,7 +115,7 @@ void ToolEstimation::initialize()
   acc_R_init_ = acc_R_init_ * 5;
 
   kf_accelerometer->initialize_system(acc_F_init_, acc_H_init_, acc_Q_init_, acc_R_init_, acc_B_init_, acc_U_init_,
-                                      acc_Z_init_);
+      acc_Z_init_);
 }
 
 void ToolEstimation::set_parameters(double control_time_init, double mass_of_tool_init)
@@ -137,6 +137,16 @@ void ToolEstimation::set_pose_input_data(Eigen::MatrixXd pose)
 
   orientation_ = tool_kinematics->get_axis_to_euler_angle(pose(3,0),pose(4,0),pose(5,0));
 }
+void ToolEstimation::set_speed_input_data(Eigen::MatrixXd speed)
+{
+  for(int num = 0; num < 3 ; num ++)
+  {
+    pose_vel_(num,0) = speed(num,0);
+  }
+
+  orientation_vel_ = tool_kinematics->get_axis_to_euler_angle(speed(3,0),speed(4,0),speed(5,0));
+
+}
 void ToolEstimation::offset_init(Eigen::MatrixXd data,  int desired_sample_num)
 {
   static int sample_num = 1;
@@ -153,7 +163,7 @@ void ToolEstimation::offset_init(Eigen::MatrixXd data,  int desired_sample_num)
 }
 
 Eigen::MatrixXd ToolEstimation::get_contacted_force(Eigen::MatrixXd ft_data,
-                                                    Eigen::MatrixXd linear_acc_data)  // input entire force torque
+    Eigen::MatrixXd linear_acc_data)  // input entire force torque
 {
   // calculate contact force
   contacted_force_torque_(0, 0) = ft_data(0, 0) - (mass_of_tool_ * linear_acc_data(0, 0)) * -1;
@@ -185,7 +195,7 @@ Eigen::MatrixXd ToolEstimation::get_angular_acc()
 
 
   //pose_vel_(num,0) = calculate_diff(pose_(num,0), control_time_);
-  orientation_vel_ = tool_statistics_orientation_vel->calculate_diff(orientation_, control_time_);
+  //orientation_vel_ = tool_statistics_orientation_vel->calculate_diff(orientation_, control_time_);
 
   //pose_acc_(num,0) = calculate_diff(pose_vel_(num,0), control_time_);
   orientation_acc_ = tool_statistics_orientation_acc->calculate_diff(orientation_vel_, control_time_);
@@ -265,5 +275,22 @@ Eigen::MatrixXd ToolEstimation::get_euler_angle()
   euler_angle = orientation_;
 
   return euler_angle;
+
+}
+Eigen::MatrixXd ToolEstimation::get_orientation_vel()
+{
+  static Eigen::MatrixXd orientation_vel;
+
+  orientation_vel = orientation_vel_;
+
+  return orientation_vel;
+}
+Eigen::MatrixXd ToolEstimation::get_orientation_acc()
+{
+  static Eigen::MatrixXd orientation_acc;
+
+  orientation_acc = orientation_acc_;
+
+  return orientation_acc;
 
 }
