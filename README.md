@@ -48,6 +48,7 @@ SDU-Sensor-Common/tool_estimation includes the following functions available:
 
     git clone https://github.com/RobotEmperor/SDU-Sensor-Common.git
     cd SDU-Sensor-Common
+    git submodule update --init --recursive
     mkdir build
     cd build
     cmake ..
