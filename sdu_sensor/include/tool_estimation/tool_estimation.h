@@ -29,11 +29,11 @@ class ToolEstimation
     void set_acc_input_data(Eigen::MatrixXd linear_acc_input);
     void set_pose_input_data(Eigen::MatrixXd pose);
     void set_speed_input_data(Eigen::MatrixXd speed);
+    Eigen::MatrixXd calculate_angular_acc();
     Eigen::MatrixXd get_offset_data();
+    Eigen::MatrixXd get_orientation_angle();
     Eigen::MatrixXd get_orientation_vel();
-    Eigen::MatrixXd get_euler_angle();
     Eigen::MatrixXd get_orientation_acc();
-    Eigen::MatrixXd get_angular_acc();
     Eigen::MatrixXd get_one_axis_inertia_tensor(Eigen::MatrixXd ft_data, std::string axis);
     Eigen::MatrixXd get_contacted_force(Eigen::MatrixXd ft_data,
                                         Eigen::MatrixXd linear_acc_data); // 6*1 data fx fy fz tx ty tz

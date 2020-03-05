@@ -178,7 +178,7 @@ Eigen::MatrixXd ToolEstimation::get_contacted_force(Eigen::MatrixXd ft_data,
   return contacted_force_torque_;
 }
 
-Eigen::MatrixXd ToolEstimation::get_angular_acc()
+Eigen::MatrixXd ToolEstimation::calculate_angular_acc()
 {
   Eigen::MatrixXd angle;  // defines roll pitch yaw
   angle.resize(3, 1);
@@ -268,7 +268,7 @@ Eigen::MatrixXd ToolEstimation::get_offset_data()
 
   return offset_data;
 }
-Eigen::MatrixXd ToolEstimation::get_euler_angle()
+Eigen::MatrixXd ToolEstimation::get_orientation_angle()
 {
   static Eigen::MatrixXd euler_angle;
 
