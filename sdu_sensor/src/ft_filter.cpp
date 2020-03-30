@@ -197,9 +197,10 @@ void FTfilter::filter_processing(Eigen::MatrixXd data)
   // kalman filer
 
   data = data - ft_offset_data_;
-  ft_filtered_data_ = kalman_filter_force_torque->get_kalman_filtered_data(data);
+  kalman_filter_force_torque->get_kalman_filtered_data(data);
+  ft_filtered_data_ = kalman_filter_force_torque->get_estimated_state();
   collision_detection_processing(data);
-
+  /*
   rate_of_change_ft_filtered_data_ = (ft_filtered_data_ - pre_ft_filtered_data_) * (1 / control_time_);
 
   pre_ft_filtered_data_ = ft_filtered_data_;
@@ -234,6 +235,7 @@ void FTfilter::filter_processing(Eigen::MatrixXd data)
       kalman_filter_force_torque->change_noise_value(R_init_);
     }
   }
+  */
 }
 
 // collision detection

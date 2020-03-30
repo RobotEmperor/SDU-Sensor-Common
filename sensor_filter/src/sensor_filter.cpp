@@ -115,7 +115,7 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
 {
   // must be designed by your system model
   F_.resize(F_init.rows(), F_init.rows());
-  H_.resize(Z_init.rows(), F_init.rows());
+  H_.resize(H_init.rows(), H_init.cols());
   Q_.resize(F_init.rows(), F_init.rows());
   R_.resize(Z_init.rows(), Z_init.rows());
 
@@ -156,9 +156,14 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
 
   kalman_gain_k_.resize(F_init.rows(), F_init.rows());
   kalman_gain_k_.fill(0);
+
+  estimated_y_.resize(H_init.rows(), 1);
+  estimated_y_.fill(0);
+  estimated_additonal_y_.resize(H_init.rows(), 1);
+  estimated_additonal_y_.fill(0);
 }
 
-Eigen::MatrixXd KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measurement_z)
+void KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measurement_y)
 {
   prediction_value_x_ = F_ * previous_correction_value_x_ + B_ * U_;
 
@@ -166,24 +171,33 @@ Eigen::MatrixXd KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measureme
 
   if ((H_ * prediction_value_p_ * H_.transpose() + R_).determinant() == 0)
   {
-    return correction_value_x_;
+    return;
   }
 
   kalman_gain_k_ = prediction_value_p_ * H_.transpose() * ((H_ * prediction_value_p_ * H_.transpose() + R_).inverse());
 
-  correction_value_x_ = prediction_value_x_ + kalman_gain_k_ * (measurement_z - (H_ * prediction_value_x_));
+  estimated_y_ = H_ * prediction_value_x_ + estimated_additonal_y_;
+
+  correction_value_x_ = prediction_value_x_ + kalman_gain_k_ * (measurement_y - estimated_y_);
 
   correction_value_p_ = prediction_value_p_ - (kalman_gain_k_ * H_ * prediction_value_p_);
 
   previous_correction_value_x_ = correction_value_x_;
   previous_correction_value_p_ = correction_value_p_;
 
-  return correction_value_x_;
 }
 
 void KalmanFilter::change_noise_value(Eigen::MatrixXd R_init)
 {
   R_ = R_init;
+}
+void KalmanFilter::set_addtional_estimated_y_term(Eigen::MatrixXd add_term)
+{
+  estimated_additonal_y_ = add_term;
+}
+Eigen::MatrixXd KalmanFilter::get_estimated_state()
+{
+  return correction_value_x_;
 }
 
 KalmanBucyFilter::KalmanBucyFilter()

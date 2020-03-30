@@ -68,9 +68,11 @@ class KalmanFilter
   void initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_init, Eigen::MatrixXd Q_init, Eigen::MatrixXd R_init,
                          Eigen::MatrixXd B_init, Eigen::MatrixXd U_init, Eigen::MatrixXd Z_init);
   void change_noise_value(Eigen::MatrixXd R_init);
+  void set_addtional_estimated_y_term(Eigen::MatrixXd add_term);
+  Eigen::MatrixXd get_estimated_state();
 
   // kalman filter process
-  Eigen::MatrixXd get_kalman_filtered_data(Eigen::MatrixXd measurement_z);
+  void get_kalman_filtered_data(Eigen::MatrixXd measurement_y);
 
  private:
   // must be designed by your system model
@@ -96,6 +98,8 @@ class KalmanFilter
 
   // kalman gain
   Eigen::MatrixXd kalman_gain_k_;
+  Eigen::MatrixXd estimated_y_;
+  Eigen::MatrixXd estimated_additonal_y_;
 
   double raw_data_;
 };
