@@ -116,12 +116,12 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
   // must be designed by your system model
   F_.resize(F_init.rows(), F_init.rows());
   H_.resize(H_init.rows(), H_init.cols());
-  Q_.resize(F_init.rows(), F_init.rows());
-  R_.resize(Z_init.rows(), Z_init.rows());
+  Q_.resize(Q_init.rows(), Q_init.rows());
+  R_.resize(R_init.rows(), R_init.rows());
 
   B_.resize(F_init.rows(), F_init.rows());
   U_.resize(F_init.rows(), 1);
-  Z_.resize(F_init.rows(), 1);
+  Z_.resize(Z_init.rows(), 1);
 
   F_ = F_init;
   H_ = H_init;
@@ -154,16 +154,18 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
   previous_correction_value_x_ = correction_value_x_;
   previous_correction_value_p_ = correction_value_p_;
 
-  kalman_gain_k_.resize(F_init.rows(), F_init.rows());
+  kalman_gain_k_.resize(F_init.rows(), H_init.rows());
   kalman_gain_k_.fill(0);
 
   estimated_y_.resize(H_init.rows(), 1);
   estimated_y_.fill(0);
-  estimated_additonal_y_.resize(H_init.rows(), 1);
-  estimated_additonal_y_.fill(0);
+  additonal_estimated_y_.resize(H_init.rows(), 1);
+  additonal_estimated_y_.fill(0);
+  output_error_.resize(H_init.rows(), 1);
+  output_error_.fill(0);
 }
 
-void KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measurement_y)
+void KalmanFilter::process_kalman_filtered_data(Eigen::MatrixXd measurement_y)
 {
   prediction_value_x_ = F_ * previous_correction_value_x_ + B_ * U_;
 
@@ -176,7 +178,7 @@ void KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measurement_y)
 
   kalman_gain_k_ = prediction_value_p_ * H_.transpose() * ((H_ * prediction_value_p_ * H_.transpose() + R_).inverse());
 
-  estimated_y_ = H_ * prediction_value_x_ + estimated_additonal_y_;
+  estimated_y_ = H_ * prediction_value_x_ + additonal_estimated_y_;
 
   correction_value_x_ = prediction_value_x_ + kalman_gain_k_ * (measurement_y - estimated_y_);
 
@@ -185,6 +187,7 @@ void KalmanFilter::get_kalman_filtered_data(Eigen::MatrixXd measurement_y)
   previous_correction_value_x_ = correction_value_x_;
   previous_correction_value_p_ = correction_value_p_;
 
+  output_error_ = measurement_y - estimated_y_;
 }
 
 void KalmanFilter::change_noise_value(Eigen::MatrixXd R_init)
@@ -193,11 +196,15 @@ void KalmanFilter::change_noise_value(Eigen::MatrixXd R_init)
 }
 void KalmanFilter::set_addtional_estimated_y_term(Eigen::MatrixXd add_term)
 {
-  estimated_additonal_y_ = add_term;
+  additonal_estimated_y_ = add_term;
 }
 Eigen::MatrixXd KalmanFilter::get_estimated_state()
 {
   return correction_value_x_;
+}
+Eigen::MatrixXd KalmanFilter::get_output_error()
+{
+  return output_error_;
 }
 
 KalmanBucyFilter::KalmanBucyFilter()

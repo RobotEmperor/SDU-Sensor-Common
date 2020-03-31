@@ -197,7 +197,7 @@ void FTfilter::filter_processing(Eigen::MatrixXd data)
   // kalman filer
 
   data = data - ft_offset_data_;
-  kalman_filter_force_torque->get_kalman_filtered_data(data);
+  kalman_filter_force_torque->process_kalman_filtered_data(data);
   ft_filtered_data_ = kalman_filter_force_torque->get_estimated_state();
   collision_detection_processing(data);
   /*

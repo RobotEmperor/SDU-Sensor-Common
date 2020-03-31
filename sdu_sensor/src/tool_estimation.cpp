@@ -17,12 +17,12 @@ ToolEstimation::~ToolEstimation()
 
 void ToolEstimation::initialize()
 {
-  kf_estimated_contact_fx = std::make_shared<KalmanFilter>();
-  kf_estimated_contact_fy = std::make_shared<KalmanFilter>();
-  kf_estimated_contact_fz = std::make_shared<KalmanFilter>();
+  kf_estimated_contact_fx_ = std::make_shared<KalmanFilter>();
+  kf_estimated_contact_fy_ = std::make_shared<KalmanFilter>();
+  kf_estimated_contact_fz_ = std::make_shared<KalmanFilter>();
 
-  kf_accelerometer        = std::make_shared<KalmanFilter>();
-  tool_kinematics         = std::make_shared<Kinematics>();
+  kf_accelerometer         = std::make_shared<KalmanFilter>();
+  tool_kinematics          = std::make_shared<Kinematics>();
   tool_statistics_orientation_vel = std::make_shared<Statistics>();
   tool_statistics_orientation_acc = std::make_shared<Statistics>();
 
@@ -81,7 +81,7 @@ void ToolEstimation::initialize()
   f_F_init_.resize(3, 3);
   f_H_init_.resize(4, 3);
   f_Q_init_.resize(3, 3);
-  f_R_init_.resize(3, 3);
+  f_R_init_.resize(4, 4);
   f_B_init_.resize(3, 3);
   f_U_init_.resize(3, 1);
   f_Z_init_.resize(3, 1);
@@ -89,8 +89,10 @@ void ToolEstimation::initialize()
   f_F_init_<<1,control_time_,pow(control_time_,2),
       0,1,control_time_,
       0,0,1;
+
   f_H_init_.setZero();
   f_H_init_(0,0) = c1;
+
   f_B_init_<<1,0,pow(control_time_,2)/mass_of_tool_,
       0,0,control_time_/mass_of_tool_,
       0,0,1/mass_of_tool_;
@@ -102,11 +104,13 @@ void ToolEstimation::initialize()
   f_Q_init_ = f_Q_init_ * 100;
   f_R_init_ = f_R_init_ * 100;
 
-  kf_estimated_contact_fx->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
-  kf_estimated_contact_fy->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
-  kf_estimated_contact_fz->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
+  kf_estimated_contact_fx_->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
+  kf_estimated_contact_fy_->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
+  kf_estimated_contact_fz_->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
 
   // observer output define
+  pseoudo_inverse_d_f_.resize(1,4);
+  pseoudo_inverse_d_f_ << 0,0,1.1986,-0.3904; // must be configurable.
 
   for(int num = 0; num < 3; num ++)
   {
@@ -120,13 +124,13 @@ void ToolEstimation::initialize()
   }
 
   // accelerometer initialize
-  acc_F_init_.resize(4, 4);
-  acc_H_init_.resize(4, 4);
-  acc_Q_init_.resize(4, 4);
-  acc_R_init_.resize(4, 4);
-  acc_B_init_.resize(4, 4);
-  acc_U_init_.resize(4, 1);
-  acc_Z_init_.resize(4, 1);
+  acc_F_init_.resize(3, 3);
+  acc_H_init_.resize(3, 3);
+  acc_Q_init_.resize(3, 3);
+  acc_R_init_.resize(3, 3);
+  acc_B_init_.resize(3, 3);
+  acc_U_init_.resize(3, 1);
+  acc_Z_init_.resize(3, 1);
 
   acc_F_init_.setIdentity();
   acc_H_init_.setIdentity();
@@ -208,18 +212,18 @@ Eigen::MatrixXd ToolEstimation::get_contacted_force(Eigen::MatrixXd position_dat
   }
 
   //calculate contact force
-  kf_estimated_contact_fx->set_addtional_estimated_y_term(estimated_output_data_[0]);
-  kf_estimated_contact_fy->set_addtional_estimated_y_term(estimated_output_data_[1]);
-  kf_estimated_contact_fz->set_addtional_estimated_y_term(estimated_output_data_[2]);
+  kf_estimated_contact_fx_->set_addtional_estimated_y_term(estimated_output_data_[0]);
+  kf_estimated_contact_fy_->set_addtional_estimated_y_term(estimated_output_data_[1]);
+  kf_estimated_contact_fz_->set_addtional_estimated_y_term(estimated_output_data_[2]);
 
-  kf_estimated_contact_fx->get_kalman_filtered_data(measured_output_data_[0]);
-  kf_estimated_contact_fy->get_kalman_filtered_data(measured_output_data_[1]);
-  kf_estimated_contact_fz->get_kalman_filtered_data(measured_output_data_[2]);
+  kf_estimated_contact_fx_->process_kalman_filtered_data(measured_output_data_[0]);
+  kf_estimated_contact_fy_->process_kalman_filtered_data(measured_output_data_[1]);
+  kf_estimated_contact_fz_->process_kalman_filtered_data(measured_output_data_[2]);
 
+  contacted_force_torque_(0, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fx_->get_output_error())(0,0);
+  contacted_force_torque_(1, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fy_->get_output_error())(0,0);
+  contacted_force_torque_(2, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fz_->get_output_error())(0,0);
 
-  //contacted_force_torque_(0, 0) = ft_data(0, 0) - (mass_of_tool_ * linear_acc_data(0, 0)) * -1;
-  //contacted_force_torque_(1, 0) = ft_data(1, 0) - (mass_of_tool_ * linear_acc_data(1, 0)) * -1;
-  //contacted_force_torque_(2, 0) = ft_data(2, 0) - (mass_of_tool_ * linear_acc_data(2, 0)) * -1;
   //contacted_force_torque_(3,0) = (inertia_of_tool_(0,0) * angular_acceleration_(0,0) + inertia_of_tool_(0,1) * angular_acceleration_(1,0) + inertia_of_tool_(0,2) * angular_acceleration_(2,0));
   //contacted_force_torque_(4,0) = (inertia_of_tool_(1,0) * angular_acceleration_(0,0) + inertia_of_tool_(1,1) * angular_acceleration_(1,0) + inertia_of_tool_(1,2) * angular_acceleration_(2,0));
   //contacted_force_torque_(5,0) = (inertia_of_tool_(2,0) * angular_acceleration_(0,0) + inertia_of_tool_(2,1) * angular_acceleration_(1,0) + inertia_of_tool_(2,2) * angular_acceleration_(2,0));
@@ -242,7 +246,7 @@ Eigen::MatrixXd ToolEstimation::calculate_angular_acc()
 
 
   //angle(0,0) = filtered_acc_(0,0);
-  // angle(1,0) = filtered_acc_(1,0);
+  //angle(1,0) = filtered_acc_(1,0);
 
 
   //pose_vel_(num,0) = calculate_diff(pose_(num,0), control_time_);

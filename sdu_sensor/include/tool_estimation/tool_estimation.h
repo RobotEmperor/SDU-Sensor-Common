@@ -40,10 +40,14 @@ public:
       Eigen::MatrixXd ft_data,
       Eigen::MatrixXd linear_acc_data); //
 
+private:
+  double control_time_;
+  double mass_of_tool_;
+
   //filter
-  std::shared_ptr<KalmanFilter> kf_estimated_contact_fx;
-  std::shared_ptr<KalmanFilter> kf_estimated_contact_fy;
-  std::shared_ptr<KalmanFilter> kf_estimated_contact_fz;
+  std::shared_ptr<KalmanFilter> kf_estimated_contact_fx_;
+  std::shared_ptr<KalmanFilter> kf_estimated_contact_fy_;
+  std::shared_ptr<KalmanFilter> kf_estimated_contact_fz_;
 
   std::shared_ptr<KalmanFilter> kf_accelerometer;
   std::shared_ptr<Kinematics> tool_kinematics;
@@ -58,18 +62,11 @@ public:
   Eigen::MatrixXd orientation_acc_;
   Eigen::MatrixXd inertia_of_tool_;
 
-private:
-  double control_time_;
-  double mass_of_tool_;
-
+  // accelerometer
   Eigen::MatrixXd tool_linear_acc_data_;
   Eigen::MatrixXd tool_linear_acc_offset_data_;
 
   Eigen::MatrixXd contacted_force_torque_;
-
-  std::map<int, Eigen::MatrixXd> estimated_output_data_;
-  std::map<int, Eigen::MatrixXd> measured_output_data_;
-  std::map<int, Eigen::MatrixXd> error_output_data_;
 
   Eigen::MatrixXd filtered_acc_;
   Eigen::MatrixXd angular_acceleration_;
@@ -86,7 +83,11 @@ private:
   double c1,c2,c3,c4,c5; // configurable variables
 
   //estimated y and real y variables
+  std::map<int, Eigen::MatrixXd> estimated_output_data_;
+  std::map<int, Eigen::MatrixXd> measured_output_data_;
+  std::map<int, Eigen::MatrixXd> error_output_data_;
 
+  Eigen::MatrixXd pseoudo_inverse_d_f_;
 
   //acc
   Eigen::MatrixXd acc_F_init_;
