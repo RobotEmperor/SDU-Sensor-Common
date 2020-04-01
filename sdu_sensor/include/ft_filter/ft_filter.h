@@ -13,7 +13,7 @@
 
 #include <Eigen/Dense>
 
-#include "sensor_filter/sensor_filter.h"
+#include "sdu_sensor/sensor_filter.h"
 #include "sdu_math/kinematics.h"
 #include "sdu_math/statistics_math.h"
 

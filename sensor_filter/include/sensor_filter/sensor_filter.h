@@ -69,6 +69,7 @@ class KalmanFilter
                          Eigen::MatrixXd B_init, Eigen::MatrixXd U_init, Eigen::MatrixXd Z_init);
   void change_noise_value(Eigen::MatrixXd R_init);
   void set_addtional_estimated_y_term(Eigen::MatrixXd add_term);
+  void set_system_input_u(Eigen::MatrixXd input_u);
   Eigen::MatrixXd get_estimated_state();
   Eigen::MatrixXd get_output_error();
 

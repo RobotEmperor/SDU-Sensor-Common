@@ -5,7 +5,7 @@
  *      Author: yik
  */
 
-#include "sensor_filter/sensor_filter.h"
+#include "sdu_sensor/sensor_filter.h"
 
 LowPassFilter::LowPassFilter()
 {
@@ -197,6 +197,10 @@ void KalmanFilter::change_noise_value(Eigen::MatrixXd R_init)
 void KalmanFilter::set_addtional_estimated_y_term(Eigen::MatrixXd add_term)
 {
   additonal_estimated_y_ = add_term;
+}
+void KalmanFilter::set_system_input_u(Eigen::MatrixXd input_u)
+{
+  U_ = input_u;
 }
 Eigen::MatrixXd KalmanFilter::get_estimated_state()
 {

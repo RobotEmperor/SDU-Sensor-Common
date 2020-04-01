@@ -16,7 +16,7 @@
 
 #include "sdu_math/kinematics.h"
 #include "sdu_math/statistics_math.h"
-#include "sensor_filter/sensor_filter.h"
+#include "sdu_sensor/sensor_filter.h"
 
 class ToolEstimation
 {
@@ -45,6 +45,7 @@ private:
   double mass_of_tool_;
 
   //filter
+  std::shared_ptr<KalmanFilter> kf_estimated_force_torque;
   std::shared_ptr<KalmanFilter> kf_estimated_contact_fx_;
   std::shared_ptr<KalmanFilter> kf_estimated_contact_fy_;
   std::shared_ptr<KalmanFilter> kf_estimated_contact_fz_;
@@ -71,7 +72,7 @@ private:
   Eigen::MatrixXd filtered_acc_;
   Eigen::MatrixXd angular_acceleration_;
 
-  //force sensor
+  //force observer sensor
   Eigen::MatrixXd f_F_init_;
   Eigen::MatrixXd f_H_init_;
   Eigen::MatrixXd f_Q_init_;
