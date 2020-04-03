@@ -210,6 +210,10 @@ Eigen::MatrixXd KalmanFilter::get_output_error()
 {
   return output_error_;
 }
+double KalmanFilter::get_contact_force()
+{
+  return 0;
+}
 
 KalmanBucyFilter::KalmanBucyFilter()
 {
