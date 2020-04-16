@@ -25,7 +25,7 @@ class LowPassFilter
   ~LowPassFilter();
   void initialize();
   void set_parameters(double control_time_init, double cutoff_frequency_init, Eigen::MatrixXd data);
-  Eigen::MatrixXd get_lpf_filtered_data(Eigen::MatrixXd data);  // frq = frequency , ctrl = control
+  Eigen::MatrixXd get_lpf_filtered_data(Eigen::MatrixXd data);  // frq = frequency , ctrl = contro
 
  private:
   double control_time_;
