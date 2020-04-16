@@ -210,6 +210,10 @@ Eigen::MatrixXd KalmanFilter::get_output_error()
 {
   return output_error_;
 }
+Eigen::MatrixXd KalmanFilter::get_kalman_gain_k()
+{
+  return kalman_gain_k_;
+}
 double KalmanFilter::get_contact_force()
 {
   return 0;

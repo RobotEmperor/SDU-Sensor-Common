@@ -236,13 +236,32 @@ Eigen::MatrixXd ToolEstimation::get_contacted_force(Eigen::MatrixXd position_dat
   kf_estimated_contact_fy_->process_kalman_filtered_data(measured_output_data_[1]);
   kf_estimated_contact_fz_->process_kalman_filtered_data(measured_output_data_[2]);
 
-  contacted_force_torque_(0, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fx_->get_output_error())(0,0);
-  contacted_force_torque_(1, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fy_->get_output_error())(0,0);
-  contacted_force_torque_(2, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fz_->get_output_error())(0,0);
 
-  //contacted_force_torque_(0, 0) = (pseoudo_inverse_d_f_*kf_estimated_contact_fx_->get_output_error())(0,0);
+  // static
+  //contacted_force_torque_(0, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fx_->get_output_error())(0,0);
+  //contacted_force_torque_(1, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fy_->get_output_error())(0,0);
+  //contacted_force_torque_(2, 0) = (pseoudo_inverse_d_f_* kf_estimated_contact_fz_->get_output_error())(0,0);
+
+  //low pass properties observer
+
+  static double v1,v2,v3;
+  static double temp1,temp2,temp3;
+
+  v1 = f_F_init_(0,0) - kf_estimated_contact_fx_->get_kalman_gain_k()(0,0)*c1;
+  v1 = f_F_init_(1,0) - kf_estimated_contact_fx_->get_kalman_gain_k()(1,0)*c1;
+  v1 = f_F_init_(2,0) - kf_estimated_contact_fx_->get_kalman_gain_k()(2,0)*c1;
 
 
+  //kalman_gain_k_(3,4) =  (1-(A(1,2).^2*kalman_gain_k_(2,4)))/(A(1,3)*A(1,2));
+
+  temp1 = (f_F_init_(0,1)*v2 + f_F_init_(0,2)*v3) * (kf_estimated_contact_fx_->get_output_error()(0,0));
+  temp2 = -(f_F_init_(0,1)*kf_estimated_contact_fx_->get_kalman_gain_k()(1,3) + f_F_init_(0,2)*kf_estimated_contact_fx_->get_kalman_gain_k()(2,3))*linear_acc_data(0,0);
+  temp3 = (f_F_init_(0,1)*(kf_estimated_contact_fx_->get_kalman_gain_k()(1,3)/mass_of_tool_) + f_F_init_(0,2)*(kf_estimated_contact_fx_->get_kalman_gain_k()(1,3)/mass_of_tool_))*ft_data(0,0);
+
+
+  contacted_force_torque_(0, 0) = (mass_of_tool_/f_F_init_(0,1))*(temp1 + temp2 + temp3);
+  contacted_force_torque_(1, 0) = 0;
+  contacted_force_torque_(2, 0) = 0;
   //contacted_force_torque_(3,0) = (inertia_of_tool_(0,0) * angular_acceleration_(0,0) + inertia_of_tool_(0,1) * angular_acceleration_(1,0) + inertia_of_tool_(0,2) * angular_acceleration_(2,0));
   //contacted_force_torque_(4,0) = (inertia_of_tool_(1,0) * angular_acceleration_(0,0) + inertia_of_tool_(1,1) * angular_acceleration_(1,0) + inertia_of_tool_(1,2) * angular_acceleration_(2,0));
   //contacted_force_torque_(5,0) = (inertia_of_tool_(2,0) * angular_acceleration_(0,0) + inertia_of_tool_(2,1) * angular_acceleration_(1,0) + inertia_of_tool_(2,2) * angular_acceleration_(2,0));
