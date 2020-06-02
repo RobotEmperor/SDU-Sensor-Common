@@ -5,7 +5,7 @@
  *      Author: yik
  */
 
-#include "sdu_sensor/sensor_filter.h"
+#include "sensor_filter/sensor_filter.h"
 
 LowPassFilter::LowPassFilter()
 {
@@ -161,8 +161,11 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
   estimated_y_.fill(0);
   additonal_estimated_y_.resize(H_init.rows(), 1);
   additonal_estimated_y_.fill(0);
-  output_error_.resize(H_init.rows(), 1);
+  output_error_.resize(F_init.rows(), 1);
   output_error_.fill(0);
+
+  measurement_output_error_.resize(H_init.rows(), 1);
+  measurement_output_error_.fill(0);
 }
 
 void KalmanFilter::process_kalman_filtered_data(Eigen::MatrixXd measurement_y)
@@ -187,7 +190,8 @@ void KalmanFilter::process_kalman_filtered_data(Eigen::MatrixXd measurement_y)
   previous_correction_value_x_ = correction_value_x_;
   previous_correction_value_p_ = correction_value_p_;
 
-  output_error_ = measurement_y - estimated_y_;
+  measurement_output_error_ = measurement_y - estimated_y_;
+  output_error_(0,0) = measurement_y(0,0) - correction_value_x_(0,0);
 }
 
 void KalmanFilter::change_noise_value(Eigen::MatrixXd R_init)
@@ -209,6 +213,10 @@ Eigen::MatrixXd KalmanFilter::get_estimated_state()
 Eigen::MatrixXd KalmanFilter::get_output_error()
 {
   return output_error_;
+}
+Eigen::MatrixXd KalmanFilter::get_measurement_output_error()
+{
+  return measurement_output_error_;
 }
 Eigen::MatrixXd KalmanFilter::get_kalman_gain_k()
 {

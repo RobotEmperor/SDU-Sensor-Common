@@ -72,6 +72,8 @@ class KalmanFilter
   void set_system_input_u(Eigen::MatrixXd input_u);
   Eigen::MatrixXd get_estimated_state();
   Eigen::MatrixXd get_output_error();
+  Eigen::MatrixXd get_measurement_output_error();
+
   Eigen::MatrixXd get_kalman_gain_k();
   double get_contact_force();
 
@@ -107,6 +109,8 @@ class KalmanFilter
   Eigen::MatrixXd estimated_y_;
   Eigen::MatrixXd additonal_estimated_y_;
   Eigen::MatrixXd output_error_;
+  Eigen::MatrixXd measurement_output_error_;
+
 
   double raw_data_;
 };

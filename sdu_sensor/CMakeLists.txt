@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED ( VERSION 2.8 )
  
-PROJECT ( "SDU-Sensor-Common" )
+PROJECT ( "sdu_sensor" )
 SET ( PROJECT_VERSION_MAJOR 0 )
 SET ( PROJECT_VERSION_MINOR 1 )
 
@@ -18,30 +18,33 @@ set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CATKIN_DEVEL_PREFIX}/lib/pkgco
 find_package(PkgConfig)
 pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 
-set(LIB_HEADER_FILES
-   ${CMAKE_SOURCE_DIR}/sensor_filter/include/sensor_filter/sensor_filter.h
-   ${CMAKE_SOURCE_DIR}/sdu_sensor/include/ft_filter/ft_filter.h
-   ${CMAKE_SOURCE_DIR}/sdu_sensor/include/tool_estimation/tool_estimation.h
-)
+#set(LIB_HEADER_FILES
+#   ${CMAKE_SOURCE_DIR}/sdu_sensor/include/ft_filter/ft_filter.h
+#   ${CMAKE_SOURCE_DIR}/sdu_sensor/include/tool_estimation/tool_estimation.h
+#)
 
-INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/sensor_filter/include
-                     ${CMAKE_SOURCE_DIR}/sdu_sensor/include)
+INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/include/
+                     ${CMAKE_SOURCE_DIR}/include/)
 
 INCLUDE_DIRECTORIES (${yaml_cpp_INCLUDE_DIRS})
 
+set(LIB_HEADER_FILES
+${CMAKE_SOURCE_DIR}/include/ft_filter/ft_filter.h
+${CMAKE_SOURCE_DIR}/include/tool_estimation/tool_estimation.h
+)
+
 set( sdu_sensor_SOURCE_FILES 
-  sensor_filter/src/sensor_filter.cpp
-  sdu_sensor/src/ft_filter.cpp
-  sdu_sensor/src/tool_estimation.cpp
+  ${CMAKE_SOURCE_DIR}/src/ft_filter.cpp
+  ${CMAKE_SOURCE_DIR}/src/tool_estimation.cpp
 )
 link_directories(/usr/local/lib)
 add_library(sdu_sensor SHARED ${sdu_sensor_SOURCE_FILES})
 set_target_properties(sdu_sensor PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(sdu_sensor sdu_math ${yaml_cpp_LIBRARIES} )
+target_link_libraries(sdu_sensor sensor_filter sdu_math ${yaml_cpp_LIBRARIES})
 
 # Generate python bindings using pybind11
-pybind11_add_module(ft_filter sdu_sensor/src/ft_filter_py.cpp)
-target_link_libraries(ft_filter PRIVATE sdu_sensor sdu_math ${yaml_cpp_LIBRARIES})
+pybind11_add_module(ft_filter ${CMAKE_SOURCE_DIR}/src/ft_filter_py.cpp)
+target_link_libraries(ft_filter PRIVATE sdu_sensor sdu_math sensor_filter ${yaml_cpp_LIBRARIES})
 target_include_directories(ft_filter PRIVATE ${EIGEN3_INCLUDE_DIR} ${yaml_cpp_INCLUDE_DIRS})
 
 if (CMAKE_COMPILER_IS_GNUCXX)
