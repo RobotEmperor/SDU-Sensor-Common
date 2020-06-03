@@ -1,7 +1,0 @@
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/install/strip.dir
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/edit_cache.dir
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/sensor_filter.dir
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/rebuild_cache.dir
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/list_install_components.dir
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/install/local.dir
-/home/yik/sdu_ws/SDU-Sensor-Common/sensor_filter/build/CMakeFiles/install.dir

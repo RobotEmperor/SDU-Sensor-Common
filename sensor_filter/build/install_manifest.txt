@@ -1,2 +1,0 @@
-/usr/local/lib/libsensor_filter.so
-/usr/local/include/sensor_filter/sensor_filter.h
