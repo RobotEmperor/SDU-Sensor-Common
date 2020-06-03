@@ -21,6 +21,9 @@ void ToolEstimation::initialize()
   mass_of_tool_ = 2.52;
   cutoff_frequency_ = 10;
 
+  r_ = 1000;
+  q_ = 0.1;
+
   kf_estimated_force = std::make_shared<KalmanFilter>();
   lpf_filtered_force = std::make_shared<LowPassFilter>(control_time_,cutoff_frequency_);
 
@@ -33,6 +36,7 @@ void ToolEstimation::initialize()
 
   inertia_of_tool_.resize(3, 3);
   contacted_force_.resize(6, 1);
+  pre_contacted_force_.resize(6,1);
 
   pose_.resize(3,1);
   orientation_.resize(3,1);
@@ -55,6 +59,7 @@ void ToolEstimation::initialize()
 
   inertia_of_tool_.fill(0);
   contacted_force_.fill(0);
+  pre_contacted_force_.fill(0);
 
   pose_.fill(0);
   orientation_.fill(0);
@@ -93,8 +98,8 @@ void ToolEstimation::initialize()
   f_R_init_.setIdentity();
   f_Z_init_.setZero();
   f_U_init_.setZero();
-  f_Q_init_ = f_Q_init_ * 1;
-  f_R_init_ = f_R_init_ * 1000;
+  f_Q_init_ = f_Q_init_ * q_;
+  f_R_init_ = f_R_init_ * r_;
 
   kf_estimated_force->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
 
@@ -105,6 +110,15 @@ void ToolEstimation::set_parameters(double control_time_init, double mass_of_too
 {
   control_time_ = control_time_init;
   mass_of_tool_ = mass_of_tool_init;
+}
+void ToolEstimation::set_noise_cov_parameters(double q_noise, double r_noise)
+{
+  q_ = q_noise;
+  r_ = r_noise;
+
+
+//  kf_estimated_force->Q_ = f_Q_init_.setIdentity()* q_;
+//  kf_estimated_force->R_ = f_R_init_.setIdentity()* r_;
 }
 
 void ToolEstimation::set_orientation_data(Eigen::MatrixXd tf_base_to_tool)
@@ -175,7 +189,12 @@ Eigen::MatrixXd ToolEstimation::get_estimated_force(Eigen::MatrixXd ft_data, Eig
 
   contacted_force_ = kf_estimated_force->get_estimated_state();
 
-  contacted_force_ = lpf_filtered_force->get_lpf_filtered_data(contacted_force_);
+
+  contacted_force_ = contacted_force_*0.01 + pre_contacted_force_*0.99;
+
+  pre_contacted_force_ = contacted_force_;
+
+  //contacted_force_ = lpf_filtered_force->get_lpf_filtered_data(contacted_force_);
 
   return contacted_force_;
 }

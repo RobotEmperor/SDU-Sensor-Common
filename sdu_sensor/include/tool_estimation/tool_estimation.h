@@ -27,6 +27,7 @@ public:
   void offset_init(Eigen::MatrixXd data, int desired_sample_num);
 
   void set_parameters(double control_time_init, double mass_of_tool_init);
+  void set_noise_cov_parameters(double q_noise, double r_noise);
   void set_orientation_data(Eigen::MatrixXd tf_base_to_tool);
   void set_gravity_input_data(Eigen::MatrixXd gravity_input);
   void set_acc_input_data(Eigen::MatrixXd linear_acc_input);
@@ -55,6 +56,9 @@ private:
   std::shared_ptr<Statistics> tool_statistics_orientation_vel;
   std::shared_ptr<Statistics> tool_statistics_orientation_acc;
 
+  //noise variables
+  double r_,q_;
+
   Eigen::MatrixXd pose_;
   Eigen::MatrixXd orientation_;
   Eigen::MatrixXd pose_vel_;
@@ -82,5 +86,6 @@ private:
   Eigen::MatrixXd f_Z_init_;
 
   Eigen::MatrixXd contacted_force_;
+  Eigen::MatrixXd pre_contacted_force_;
 };
 #endif /* TOOL_ESTIMATION_H_ */
