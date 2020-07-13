@@ -49,12 +49,10 @@ private:
   double cutoff_frequency_;
 
   //filter
-  std::shared_ptr<LowPassFilter> lpf_filtered_force;
-  std::shared_ptr<KalmanFilter> kf_estimated_force;
+  KalmanFilter* kf_estimated_force;
 
-  std::shared_ptr<Kinematics> tool_kinematics;
-  std::shared_ptr<Statistics> tool_statistics_orientation_vel;
-  std::shared_ptr<Statistics> tool_statistics_orientation_acc;
+  //std::shared_ptr<Statistics> tool_statistics_orientation_vel;
+  //std::shared_ptr<Statistics> tool_statistics_orientation_acc;
 
   //noise variables
   double r_,q_;

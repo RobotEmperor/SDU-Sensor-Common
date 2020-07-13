@@ -13,6 +13,7 @@ ToolEstimation::ToolEstimation()
 
 ToolEstimation::~ToolEstimation()
 {
+  delete kf_estimated_force;
 }
 
 void ToolEstimation::initialize()
@@ -24,19 +25,14 @@ void ToolEstimation::initialize()
   r_ = 1000;
   q_ = 0.1;
 
-  kf_estimated_force = std::make_shared<KalmanFilter>();
-  lpf_filtered_force = std::make_shared<LowPassFilter>(control_time_,cutoff_frequency_);
-
-  tool_kinematics          = std::make_shared<Kinematics>();
-  tool_statistics_orientation_vel = std::make_shared<Statistics>();
-  tool_statistics_orientation_acc = std::make_shared<Statistics>();
+  kf_estimated_force = new KalmanFilter;
 
   tool_linear_acc_offset_data_.resize(4, 1);
   tool_linear_acc_data_.resize(4, 1);
 
   inertia_of_tool_.resize(3, 3);
-  contacted_force_.resize(6, 1);
-  pre_contacted_force_.resize(6,1);
+  contacted_force_.resize(3, 1);
+  pre_contacted_force_.resize(3,1);
 
   pose_.resize(3,1);
   orientation_.resize(3,1);
@@ -47,8 +43,8 @@ void ToolEstimation::initialize()
   pose_acc_.resize(3,1);
   orientation_acc_.resize(3,1);
 
-  tool_statistics_orientation_vel->set_dimension(orientation_);
-  tool_statistics_orientation_acc->set_dimension(orientation_);
+//  tool_statistics_orientation_vel->set_dimension(orientation_);
+//  tool_statistics_orientation_acc->set_dimension(orientation_);
 
   orientation_base_to_tool_.resize(3,3);
   orientation_base_to_tool_.fill(0);
@@ -102,8 +98,6 @@ void ToolEstimation::initialize()
   f_R_init_ = f_R_init_ * r_;
 
   kf_estimated_force->initialize_system(f_F_init_, f_H_init_, f_Q_init_, f_R_init_, f_B_init_, f_U_init_, f_Z_init_);
-
-  lpf_filtered_force->set_parameters(control_time_, cutoff_frequency_, f_Z_init_);
 }
 
 void ToolEstimation::set_parameters(double control_time_init, double mass_of_tool_init)
@@ -115,10 +109,6 @@ void ToolEstimation::set_noise_cov_parameters(double q_noise, double r_noise)
 {
   q_ = q_noise;
   r_ = r_noise;
-
-
-//  kf_estimated_force->Q_ = f_Q_init_.setIdentity()* q_;
-//  kf_estimated_force->R_ = f_R_init_.setIdentity()* r_;
 }
 
 void ToolEstimation::set_orientation_data(Eigen::MatrixXd tf_base_to_tool)
@@ -143,7 +133,7 @@ void ToolEstimation::set_pose_input_data(Eigen::MatrixXd pose)
     pose_(num,0) = pose(num,0);
   }
 
-  orientation_ = tool_kinematics->get_axis_to_euler_angle(pose(3,0),pose(4,0),pose(5,0));
+  //orientation_ = tool_kinematics->get_axis_to_euler_angle(pose(3,0),pose(4,0),pose(5,0));
 }
 void ToolEstimation::set_speed_input_data(Eigen::MatrixXd speed)
 {
@@ -152,7 +142,7 @@ void ToolEstimation::set_speed_input_data(Eigen::MatrixXd speed)
     pose_vel_(num,0) = speed(num,0);
   }
 
-  orientation_vel_ = tool_kinematics->get_axis_to_euler_angle(speed(3,0),speed(4,0),speed(5,0));
+  //orientation_vel_ = tool_kinematics->get_axis_to_euler_angle(speed(3,0),speed(4,0),speed(5,0));
 
 }
 void ToolEstimation::offset_init(Eigen::MatrixXd data,  int desired_sample_num)
@@ -177,6 +167,8 @@ Eigen::MatrixXd ToolEstimation::get_estimated_force(Eigen::MatrixXd ft_data, Eig
     return contacted_force_;
 
   compensated_acc_ = linear_acc_data - (orientation_base_to_tool_.inverse()*gravity_);
+
+  compensated_acc_ = orientation_base_to_tool_ * compensated_acc_;
 
   ft_data(0,0) =  ft_data(0,0) - (mass_of_tool_*compensated_acc_)(0,0);
   ft_data(1,0) =  ft_data(1,0) - (mass_of_tool_*compensated_acc_)(1,0);
@@ -219,7 +211,7 @@ Eigen::MatrixXd ToolEstimation::calculate_angular_acc()
   //orientation_vel_ = tool_statistics_orientation_vel->calculate_diff(orientation_, control_time_);
 
   //pose_acc_(num,0) = calculate_diff(pose_vel_(num,0), control_time_);
-  orientation_acc_ = tool_statistics_orientation_acc->calculate_diff(orientation_vel_, control_time_);
+ // orientation_acc_ = tool_statistics_orientation_acc->calculate_diff(orientation_vel_, control_time_);
 
   angular_acceleration_ = orientation_acc_;
 
