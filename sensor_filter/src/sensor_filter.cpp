@@ -170,28 +170,28 @@ void KalmanFilter::initialize_system(Eigen::MatrixXd F_init, Eigen::MatrixXd H_i
 
 void KalmanFilter::process_kalman_filtered_data(Eigen::MatrixXd measurement_y)
 {
-  prediction_value_x_ = F_ * previous_correction_value_x_ + B_ * U_;
+//  prediction_value_x_ = F_ * previous_correction_value_x_ + B_ * U_;
 
   prediction_value_p_ = F_ * correction_value_p_ * F_.transpose() + Q_;
 
-  if ((H_ * prediction_value_p_ * H_.transpose() + R_).determinant() == 0)
-  {
-    return;
-  }
-
-  kalman_gain_k_ = prediction_value_p_ * H_.transpose() * ((H_ * prediction_value_p_ * H_.transpose() + R_).inverse());
-
-  estimated_y_ = H_ * prediction_value_x_ + additonal_estimated_y_;
-
-  correction_value_x_ = prediction_value_x_ + kalman_gain_k_ * (measurement_y - estimated_y_);
-
-  correction_value_p_ = prediction_value_p_ - (kalman_gain_k_ * H_ * prediction_value_p_);
-
-  previous_correction_value_x_ = correction_value_x_;
-  previous_correction_value_p_ = correction_value_p_;
-
-  measurement_output_error_ = measurement_y - estimated_y_;
-  output_error_(0,0) = measurement_y(0,0) - correction_value_x_(0,0);
+//  if ((H_ * prediction_value_p_ * H_.transpose() + R_).determinant() == 0)
+//  {
+//    return;
+//  }
+//
+//  kalman_gain_k_ = prediction_value_p_ * H_.transpose() * ((H_ * prediction_value_p_ * H_.transpose() + R_).inverse());
+//
+//  estimated_y_ = H_ * prediction_value_x_ + additonal_estimated_y_;
+//
+//  correction_value_x_ = prediction_value_x_ + kalman_gain_k_ * (measurement_y - estimated_y_);
+//
+//  correction_value_p_ = prediction_value_p_ - (kalman_gain_k_ * H_ * prediction_value_p_);
+//
+//  previous_correction_value_x_ = correction_value_x_;
+//  previous_correction_value_p_ = correction_value_p_;
+//
+//  measurement_output_error_ = measurement_y - estimated_y_;
+//  output_error_(0,0) = measurement_y(0,0) - correction_value_x_(0,0);
 }
 
 void KalmanFilter::change_noise_value(Eigen::MatrixXd R_init)
